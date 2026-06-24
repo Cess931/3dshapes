@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D & 3D Shapes Challenge</title>
+    <style>
+        :root {
+            --primary: #4a00e0;
+            --secondary: #8e2de2;
+            --success: #00b09b;
+            --danger: #ff416c;
+            --bg: #f0f2f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            color: #333;
+        }
+
+        .game-container {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .level-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+        }
+
+        .score-badge {
+            font-weight: bold;
+            color: #666;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #96c93d);
+            width: 2%;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .display-area {
+            height: clamp(150px, 25vh, 220px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #fafafa;
+            border-radius: 15px;
+            border: 2px dashed #ddd;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Shape CSS Responsive Styling --- */
+        .shape {
+            transition: transform 0.3s ease;
+            max-width: 100%;
+            max-height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .shape svg {
+            width: clamp(100px, 20vw, 130px);
+            height: clamp(100px, 20vw, 130px);
+        }
+
+        /* 3D Isometric Projection Setup */
+        .scene3d {
+            width: clamp(80px, 18vw, 110px);
+            height: clamp(80px, 18vw, 110px);
+            transform-style: preserve-3d;
+            animation: spin 8s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotateX(-20deg) rotateY(0deg); }
+            100% { transform: rotateX(-20deg) rotateY(360deg); }
+        }
+
+        .cube {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+        
+        /* Dynamic 3D face sizing using inheritance */
+        .cube-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(142, 45, 226, 0.7);
+            border: 2px solid #fff;
+        }
+        
+        /* Responsive 3D shifting using translation values tied to container size */
+        .face-front  { transform: rotateY(  0deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
+        .face-back   { transform: rotateY(180deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
+        .face-right  { transform: rotateY( 90deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
+        .face-left   { transform: rotateY(-90deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
+        .face-top    { transform: rotateX( 90deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); background: rgba(170, 80, 250, 0.8); }
+        .face-bottom { transform: rotateX(-90deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
+
+        /* Options Grid - Dynamic auto-adjust for mobile stacks */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        @media (max-width: 400px) {
+            .options-grid {
+                grid-template-columns: 1fr; /* Stack buttons single file on tiny displays */
+            }
+        }
+
+        .btn {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            padding: clamp(10px, 3vw, 15px);
+            font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #eef2f7;
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn.correct {
+            background: var(--success) !important;
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn.wrong {
+            background: var(--danger) !important;
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .audio-btn {
+            background: none;
+            border: none;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            cursor: pointer;
+            padding: 5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        #start-screen h1, #win-screen h2 {
+            font-size: clamp(1.6rem, 6vw, 2.2rem);
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        #start-screen p, #win-screen p {
+            font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .start-btn {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 12px 35px;
+            font-size: clamp(1.1rem, 4vw, 1.3rem);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(142, 45, 226, 0.4);
+            width: 100%;
+            max-width: 250px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="start-screen" class="screen active">
+            <h1>Shapes Challenge!</h1>
+            <p>Master 50 Levels of 2D and 3D shapes with interactive voice commentary.</p>
+            <button class="start-btn" onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div class="header">
+                <span class="level-badge" id="level-display">Level 1/50</span>
+                <span class="score-badge" id="score-display">Score: 0</span>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress" id="progress-juice"></div>
+            </div>
+
+            <div class="question">
+                <span id="question-text">What shape is this?</span>
+                <button class="audio-btn" onclick="repeatQuestion()" aria-label="Repeat Audio">🔊</button>
+            </div>
+
+            <div class="display-area" id="shape-viewport">
+                </div>
+
+            <div class="options-grid" id="options-container">
+                </div>
+        </div>
+
+        <div id="win-screen" class="screen">
+            <h2>🎉 Congratulations! 🎉</h2>
+            <p>You have conquered all 50 levels and became a true Shapes Master!</p>
+            <p id="final-score" style="font-weight: bold; color: var(--success); margin-bottom: 20px;"></p>
+            <button class="start-btn" onclick="startGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Database of Shapes (Maintained structure with fluid SVG viewbox styling)
+        const shapes2D = [
+            { name: 'Circle', type: '2D', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#36d1dc" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Square', type: '2D', html: `<svg viewBox="0 0 120 120"><rect x="10" y="10" width="100" height="100" fill="#ff7675" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Triangle', type: '2D', html: `<svg viewBox="0 0 120 120"><polygon points="60,10 110,110 10,110" fill="#00cec9" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Rectangle', type: '2D', html: `<svg viewBox="0 0 140 120"><rect x="10" y="25" width="120" height="70" fill="#6c5ce7" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Pentagon', type: '2D', html: `<svg viewBox="0 0 120 120"><polygon points="60,10 110,45 90,110 30,110 10,45" fill="#fdcb6e" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Hexagon', type: '2D', html: `<svg viewBox="0 0 120 120"><polygon points="60,10 110,35 110,85 60,110 10,85 10,35" fill="#e84393" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Oval', type: '2D', html: `<svg viewBox="0 0 140 120"><ellipse cx="70" cy="60" rx="60" ry="40" fill="#00b894" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Star', type: '2D', html: `<svg viewBox="0 0 120 120"><polygon points="60,5 75,45 115,45 83,70 95,110 60,85 25,110 37,70 5,45 45,45" fill="#f1c40f" stroke="#fff" stroke-width="3"/></svg>` }
+        ];
+
+        const shapes3D = [
+            { name: 'Cube', type: '3D', html: `<div class="scene3d"><div class="cube"><div class="cube-face face-front"></div><div class="cube-face face-back"></div><div class="cube-face face-right"></div><div class="cube-face face-left"></div><div class="cube-face face-top"></div><div class="cube-face face-bottom"></div></div></div>` },
+            { name: 'Sphere', type: '3D', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="sphereGrad" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#a29bfe"/><stop offset="100%" stop-color="#6c5ce7"/></radialGradient></defs><circle cx="60" cy="60" r="50" fill="url(#sphereGrad)"/></svg>` },
+            { name: 'Cylinder', type: '3D', html: `<svg viewBox="0 0 120 140"><ellipse cx="60" cy="25" rx="35" ry="12" fill="#ffeaa7" stroke="#d63031" stroke-width="2"/><path d="M25,25 L25,105 A35,12 0 0,0 95,105 L95,25" fill="#fab1a0" stroke="#d63031" stroke-width="2"/><ellipse cx="60" cy="105" rx="35" ry="12" fill="#fab1a0" stroke="#d63031" stroke-width="2"/></svg>` },
+            { name: 'Cone', type: '3D', html: `<svg viewBox="0 0 120 140"><path d="M60,15 L25,105 A35,12 0 0,0 95,105 Z" fill="#95afc0" stroke="#535c68" stroke-width="2"/><ellipse cx="60" cy="105" rx="35" ry="12" fill="#c7ecee" stroke="#535c68" stroke-width="2"/></svg>` }
+        ];
+
+        const allShapes = [...shapes2D, ...shapes3D];
+
+        let currentLevel = 1;
+        let score = 0;
+        let currentShape = null;
+        let isProcessing = false;
+
+        const synth = window.speechSynthesis;
+
+        function speak(text) {
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1.0;
+            utterance.pitch = 1.1;
+            synth.speak(utterance);
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startGame() {
+            currentLevel = 1;
+            score = 0;
+            showScreen('game-screen');
+            loadLevel();
+        }
+
+        function loadLevel() {
+            isProcessing = false;
+            document.getElementById('level-display').innerText = `Level ${currentLevel}/50`;
+            document.getElementById('score-display').innerText = `Score: ${score}`;
+            document.getElementById('progress-juice').style.width = `${(currentLevel / 50) * 100}%`;
+
+            let pool = [...allShapes];
+            currentShape = pool[Math.floor(Math.random() * pool.length)];
+
+            let questionType = currentLevel % 3; 
+            let questionText = "";
+
+            if (questionType === 1) {
+                questionText = `Identify the shape shown in the picture.`;
+            } else if (questionType === 2) {
+                questionText = `Is this a 2D shape or a 3D shape?`;
+            } else {
+                questionText = `Find the ${currentShape.name}.`;
+            }
+
+            document.getElementById('question-text').innerText = questionText;
+            document.getElementById('shape-viewport').innerHTML = `<div class="shape">${currentShape.html}</div>`;
+
+            speak(questionText);
+            generateOptions(questionType);
+        }
+
+        function generateOptions(type) {
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            let options = [];
+
+            if (type === 2) {
+                options = ['2D', '3D'];
+            } else {
+                options.push(currentShape.name);
+                while (options.length < 4) {
+                    let randomShape = allShapes[Math.floor(Math.random() * allShapes.length)].name;
+                    if (!options.includes(randomShape)) {
+                        options.push(randomShape);
+                    }
+                }
+                options.sort(() => Math.random() - 0.5);
+            }
+
+            options.forEach(opt => {
+                const button = document.createElement('button');
+                button.className = 'btn';
+                button.innerText = opt;
+                button.onclick = () => handleAnswer(opt, button, type);
+                container.appendChild(button);
+            });
+        }
+
+        function handleAnswer(selected, button, type) {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            let isCorrect = false;
+            if (type === 2) {
+                isCorrect = (selected === currentShape.type);
+            } else {
+                isCorrect = (selected === currentShape.name);
+            }
+
+            if (isCorrect) {
+                button.classList.add('correct');
+                score += 10;
+                speak("Correct! Outstanding job.");
+                
+                setTimeout(() => {
+                    if (currentLevel < 50) {
+                        currentLevel++;
+                        loadLevel();
+                    } else {
+                        endGame();
+                    }
+                }, 1500);
+
+            } else {
+                button.classList.add('wrong');
+                speak("Try again!");
+                
+                setTimeout(() => {
+                    isProcessing = false;
+                    button.classList.remove('wrong');
+                }, 1200);
+            }
+        }
+
+        function repeatQuestion() {
+            const questionText = document.getElementById('question-text').innerText;
+            speak(questionText);
+        }
+
+        function endGame() {
+            showScreen('win-screen');
+            document.getElementById('final-score').innerText = `Your Final Score: ${score} points`;
+            speak("Congratulations! You completed all 50 levels of the shapes challenge!");
+        }
+    </script>
+</body>
+</html>
