@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D & 3D Shapes Challenge</title>
+    <title>2D & 3D Shapes & Planets Challenge</title>
     <style>
         :root {
             --primary: #4a00e0;
             --secondary: #8e2de2;
             --success: #00b09b;
             --danger: #ff416c;
+            --space-bg: #050510;
             --bg: #f0f2f5;
         }
 
@@ -94,7 +95,7 @@
         }
 
         .display-area {
-            height: clamp(150px, 25vh, 220px);
+            height: clamp(160px, 28vh, 240px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -104,9 +105,20 @@
             border: 2px dashed #ddd;
             position: relative;
             overflow: hidden;
+            transition: background 0.4s ease;
         }
 
-        /* --- Shape CSS Responsive Styling --- */
+        /* Dark outer space background style with soft star field */
+        .display-area.space-mode {
+            background: var(--space-bg);
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
+            background-size: 120px 120px, 90px 90px;
+            background-position: 0 0, 40px 60px;
+            border-color: #1e293b;
+        }
+
         .shape {
             transition: transform 0.3s ease;
             max-width: 100%;
@@ -117,8 +129,8 @@
         }
         
         .shape svg {
-            width: clamp(100px, 20vw, 130px);
-            height: clamp(100px, 20vw, 130px);
+            width: clamp(110px, 24vw, 150px);
+            height: clamp(110px, 24vw, 150px);
         }
 
         /* 3D Isometric Projection Setup */
@@ -141,7 +153,6 @@
             transform-style: preserve-3d;
         }
         
-        /* Dynamic 3D face sizing using inheritance */
         .cube-face {
             position: absolute;
             width: 100%;
@@ -150,7 +161,6 @@
             border: 2px solid #fff;
         }
         
-        /* Responsive 3D shifting using translation values tied to container size */
         .face-front  { transform: rotateY(  0deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
         .face-back   { transform: rotateY(180deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
         .face-right  { transform: rotateY( 90deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
@@ -158,16 +168,16 @@
         .face-top    { transform: rotateX( 90deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); background: rgba(170, 80, 250, 0.8); }
         .face-bottom { transform: rotateX(-90deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
 
-        /* Options Grid - Dynamic auto-adjust for mobile stacks */
+        /* Options Grid */
         .options-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 12px;
         }
 
         @media (max-width: 400px) {
             .options-grid {
-                grid-template-columns: 1fr; /* Stack buttons single file on tiny displays */
+                grid-template-columns: 1fr;
             }
         }
 
@@ -233,6 +243,13 @@
             line-height: 1.4;
         }
 
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
         .start-btn {
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
@@ -243,7 +260,12 @@
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(142, 45, 226, 0.4);
             width: 100%;
-            max-width: 250px;
+            max-width: 280px;
+        }
+
+        .start-btn.space {
+            background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
         }
     </style>
 </head>
@@ -251,9 +273,12 @@
 
     <div class="game-container">
         <div id="start-screen" class="screen active">
-            <h1>Shapes Challenge!</h1>
-            <p>Master 50 Levels of 2D and 3D shapes with interactive voice commentary.</p>
-            <button class="start-btn" onclick="startGame()">Start Game</button>
+            <h1>Shapes & Planets!</h1>
+            <p>Master 50 Levels with interactive voice commentary. Choose your challenge mode below!</p>
+            <div class="button-group">
+                <button class="start-btn" onclick="startGame('shapes')">Geometry Mode 🔺</button>
+                <button class="start-btn space" onclick="startGame('planets')">Planet Mode 🚀</button>
+            </div>
         </div>
 
         <div id="game-screen" class="screen">
@@ -280,14 +305,13 @@
 
         <div id="win-screen" class="screen">
             <h2>🎉 Congratulations! 🎉</h2>
-            <p>You have conquered all 50 levels and became a true Shapes Master!</p>
+            <p id="win-message">You have conquered all 50 levels!</p>
             <p id="final-score" style="font-weight: bold; color: var(--success); margin-bottom: 20px;"></p>
-            <button class="start-btn" onclick="startGame()">Play Again</button>
+            <button class="start-btn" onclick="showScreen('start-screen')">Main Menu</button>
         </div>
     </div>
 
     <script>
-        // Database of Shapes (Maintained structure with fluid SVG viewbox styling)
         const shapes2D = [
             { name: 'Circle', type: '2D', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#36d1dc" stroke="#fff" stroke-width="3"/></svg>` },
             { name: 'Square', type: '2D', html: `<svg viewBox="0 0 120 120"><rect x="10" y="10" width="100" height="100" fill="#ff7675" stroke="#fff" stroke-width="3"/></svg>` },
@@ -306,12 +330,121 @@
             { name: 'Cone', type: '3D', html: `<svg viewBox="0 0 120 140"><path d="M60,15 L25,105 A35,12 0 0,0 95,105 Z" fill="#95afc0" stroke="#535c68" stroke-width="2"/><ellipse cx="60" cy="105" rx="35" ry="12" fill="#c7ecee" stroke="#535c68" stroke-width="2"/></svg>` }
         ];
 
+        // NEW: Photorealistic planet vector renderings using layered shading models
+        const planetsPool = [
+            { name: 'Mars', type: 'Planet', html: `
+                <svg viewBox="0 0 120 120">
+                    <defs>
+                        <radialGradient id="marsBase" cx="30%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#f87171"/>
+                            <stop offset="45%" stop-color="#e11d48"/>
+                            <stop offset="85%" stop-color="#9f1239"/>
+                            <stop offset="100%" stop-color="#4c0519"/>
+                        </radialGradient>
+                        <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
+                            <stop offset="75%" stop-color="#000" stop-opacity="0"/>
+                            <stop offset="100%" stop-color="#000" stop-opacity="0.8"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="60" cy="60" r="48" fill="url(#marsBase)"/>
+                    <path d="M35,30 Q45,20 65,35 T90,30 T50,55 Z" fill="#881337" opacity="0.4"/>
+                    <path d="M25,75 Q50,60 70,80 T100,65 Q80,95 45,90 Z" fill="#4c0519" opacity="0.3"/>
+                    <circle cx="58" cy="14" rx="10" ry="3" fill="#fee2e2" opacity="0.6" transform="rotate(-10 58 14)"/> <circle cx="60" cy="60" r="48" fill="url(#shadow)"/>
+                </svg>` 
+            },
+            { name: 'Earth', type: 'Planet', html: `
+                <svg viewBox="0 0 120 120">
+                    <defs>
+                        <radialGradient id="oceanGrad" cx="35%" cy="35%" r="65%">
+                            <stop offset="0%" stop-color="#38bdf8"/>
+                            <stop offset="30%" stop-color="#1d4ed8"/>
+                            <stop offset="85%" stop-color="#1e3a8a"/>
+                            <stop offset="100%" stop-color="#0f172a"/>
+                        </radialGradient>
+                        <radialGradient id="atmosphere" cx="50%" cy="50%" r="50%">
+                            <stop offset="90%" stop-color="#06b6d4" stop-opacity="0"/>
+                            <stop offset="98%" stop-color="#06b6d4" stop-opacity="0.5"/>
+                            <stop offset="100%" stop-color="#38bdf8" stop-opacity="1"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="60" cy="60" r="48" fill="url(#oceanGrad)"/>
+                    <path d="M40,25 Q42,15 65,22 Q75,30 70,45 Q55,60 45,50 Z M25,65 Q35,55 55,70 Q75,60 85,75 Q70,95 40,90 Q20,85 25,65 Z" fill="#15803d" opacity="0.85"/>
+                    <path d="M42,28 Q48,22 58,30 M30,70 Q45,65 55,75" fill="#166534" opacity="0.9"/> <path d="M20,40 Q40,30 65,45 T100,35 Q80,55 50,48 T20,40 Z M35,75 Q60,65 85,80 Q65,90 40,85 Z" fill="#ffffff" opacity="0.45"/>
+                    <circle cx="60" cy="60" r="48" fill="url(#shadow)"/>
+                    <circle cx="60" cy="60" r="49" fill="url(#atmosphere)" pointer-events="none"/>
+                </svg>` 
+            },
+            { name: 'Saturn', type: 'Planet', html: `
+                <svg viewBox="0 0 160 120">
+                    <defs>
+                        <radialGradient id="saturnGrad" cx="40%" cy="35%" r="60%">
+                            <stop offset="0%" stop-color="#fef08a"/>
+                            <stop offset="60%" stop-color="#eab308"/>
+                            <stop offset="85%" stop-color="#a16207"/>
+                            <stop offset="100%" stop-color="#451a03"/>
+                        </radialGradient>
+                    </defs>
+                    <g transform="rotate(-12 80 60)">
+                        <ellipse cx="80" cy="60" rx="72" ry="18" fill="none" stroke="#a16207" stroke-width="8" opacity="0.3"/>
+                        <ellipse cx="80" cy="60" rx="66" ry="15" fill="none" stroke="#ca8a04" stroke-width="6" opacity="0.6"/>
+                        <ellipse cx="80" cy="60" rx="58" ry="11" fill="none" stroke="#fef08a" stroke-width="4" opacity="0.5"/>
+                    </g>
+                    <circle cx="80" cy="60" r="38" fill="url(#saturnGrad)"/>
+                    <path d="M43,52 Q80,58 117,52 L116,56 Q80,62 44,56 Z" fill="#ca8a04" opacity="0.4"/>
+                    <path d="M46,42 Q80,47 114,42 L113,45 Q80,50 47,45 Z" fill="#854d0e" opacity="0.3"/>
+                    <circle cx="80" cy="60" r="38" fill="url(#shadow)"/>
+                    <g transform="rotate(-12 80 60)">
+                        <path d="M8,60 A72,18 0 0,0 152,60" fill="none" stroke="#a16207" stroke-width="8" opacity="0.4"/>
+                        <path d="M14,60 A66,15 0 0,0 146,60" fill="none" stroke="#ca8a04" stroke-width="6" opacity="0.8"/>
+                        <path d="M22,60 A58,11 0 0,0 138,60" fill="none" stroke="#fef08a" stroke-width="4" opacity="0.7"/>
+                    </g>
+                </svg>` 
+            },
+            { name: 'Neptune', type: 'Planet', html: `
+                <svg viewBox="0 0 120 120">
+                    <defs>
+                        <radialGradient id="nepGrad" cx="30%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#60a5fa"/>
+                            <stop offset="40%" stop-color="#2563eb"/>
+                            <stop offset="80%" stop-color="#1d4ed8"/>
+                            <stop offset="100%" stop-color="#031b4e"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="60" cy="60" r="48" fill="url(#nepGrad)"/>
+                    <ellipse cx="45" cy="55" rx="14" ry="6" fill="#1e3a8a" opacity="0.5" transform="rotate(-10 45 55)"/> <path d="M20,35 Q50,42 100,30" fill="none" stroke="#93c5fd" stroke-width="1.5" opacity="0.4"/>
+                    <path d="M15,75 Q60,65 105,72" fill="none" stroke="#2563eb" stroke-width="2" opacity="0.6"/>
+                    <path d="M45,70 Q55,68 65,72" fill="none" stroke="#fff" stroke-width="1" opacity="0.5"/> <circle cx="60" cy="60" r="48" fill="url(#shadow)"/>
+                </svg>` 
+            },
+            { name: 'Jupiter', type: 'Planet', html: `
+                <svg viewBox="0 0 120 120">
+                    <defs>
+                        <radialGradient id="jupGrad" cx="35%" cy="30%" r="65%">
+                            <stop offset="0%" stop-color="#ffedd5"/>
+                            <stop offset="25%" stop-color="#fed7aa"/>
+                            <stop offset="55%" stop-color="#ea580c"/>
+                            <stop offset="85%" stop-color="#9a3412"/>
+                            <stop offset="100%" stop-color="#431407"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="60" cy="60" r="48" fill="url(#jupGrad)"/>
+                    <path d="M13,42 Q60,48 107,42 L109,47 Q60,53 11,47 Z" fill="#ffedd5" opacity="0.25"/>
+                    <path d="M11,54 Q60,60 109,54 L111,61 Q60,67 9,61 Z" fill="#7c2d12" opacity="0.4"/>
+                    <path d="M12,68 Q60,72 108,68 L106,73 Q60,77 14,73 Z" fill="#fdba74" opacity="0.3"/>
+                    <ellipse cx="78" cy="72" rx="10" ry="6" fill="#991b1b" opacity="0.85"/>
+                    <ellipse cx="78" cy="71" rx="7" ry="3" fill="#ea580c" opacity="0.6"/>
+                    <circle cx="60" cy="60" r="48" fill="url(#shadow)"/>
+                </svg>` 
+            }
+        ];
+
         const allShapes = [...shapes2D, ...shapes3D];
 
         let currentLevel = 1;
         let score = 0;
-        let currentShape = null;
+        let currentItem = null;
         let isProcessing = false;
+        let gameMode = 'shapes';
 
         const synth = window.speechSynthesis;
 
@@ -328,9 +461,18 @@
             document.getElementById(screenId).classList.add('active');
         }
 
-        function startGame() {
+        function startGame(mode) {
+            gameMode = mode;
             currentLevel = 1;
             score = 0;
+            
+            const viewport = document.getElementById('shape-viewport');
+            if (gameMode === 'planets') {
+                viewport.classList.add('space-mode');
+            } else {
+                viewport.classList.remove('space-mode');
+            }
+
             showScreen('game-screen');
             loadLevel();
         }
@@ -341,37 +483,40 @@
             document.getElementById('score-display').innerText = `Score: ${score}`;
             document.getElementById('progress-juice').style.width = `${(currentLevel / 50) * 100}%`;
 
-            let pool = [...allShapes];
-            currentShape = pool[Math.floor(Math.random() * pool.length)];
-
-            let questionType = currentLevel % 3; 
             let questionText = "";
+            let pool = gameMode === 'shapes' ? [...allShapes] : [...planetsPool];
+            currentItem = pool[Math.floor(Math.random() * pool.length)];
 
-            if (questionType === 1) {
-                questionText = `Identify the shape shown in the picture.`;
-            } else if (questionType === 2) {
-                questionText = `Is this a 2D shape or a 3D shape?`;
+            if (gameMode === 'shapes') {
+                let questionType = currentLevel % 3; 
+                if (questionType === 1) {
+                    questionText = `Identify the shape shown in the picture.`;
+                } else if (questionType === 2) {
+                    questionText = `Is this a 2D shape or a 3D shape?`;
+                } else {
+                    questionText = `Find the ${currentItem.name}.`;
+                }
+                generateOptions(questionType);
             } else {
-                questionText = `Find the ${currentShape.name}.`;
+                questionText = `Which cosmic planet is this?`;
+                generatePlanetOptions();
             }
 
             document.getElementById('question-text').innerText = questionText;
-            document.getElementById('shape-viewport').innerHTML = `<div class="shape">${currentShape.html}</div>`;
+            document.getElementById('shape-viewport').innerHTML = `<div class="shape">${currentItem.html}</div>`;
 
             speak(questionText);
-            generateOptions(questionType);
         }
 
         function generateOptions(type) {
             const container = document.getElementById('options-container');
             container.innerHTML = '';
-
             let options = [];
 
             if (type === 2) {
                 options = ['2D', '3D'];
             } else {
-                options.push(currentShape.name);
+                options.push(currentItem.name);
                 while (options.length < 4) {
                     let randomShape = allShapes[Math.floor(Math.random() * allShapes.length)].name;
                     if (!options.includes(randomShape)) {
@@ -381,6 +526,26 @@
                 options.sort(() => Math.random() - 0.5);
             }
 
+            renderButtons(options, type);
+        }
+
+        function generatePlanetOptions() {
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            let options = [currentItem.name];
+
+            while (options.length < 2) {
+                let randomPlanet = planetsPool[Math.floor(Math.random() * planetsPool.length)].name;
+                if (!options.includes(randomPlanet)) {
+                    options.push(randomPlanet);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            renderButtons(options, 0);
+        }
+
+        function renderButtons(options, type) {
+            const container = document.getElementById('options-container');
             options.forEach(opt => {
                 const button = document.createElement('button');
                 button.className = 'btn';
@@ -395,10 +560,10 @@
             isProcessing = true;
 
             let isCorrect = false;
-            if (type === 2) {
-                isCorrect = (selected === currentShape.type);
+            if (gameMode === 'shapes' && type === 2) {
+                isCorrect = (selected === currentItem.type);
             } else {
-                isCorrect = (selected === currentShape.name);
+                isCorrect = (selected === currentItem.name);
             }
 
             if (isCorrect) {
@@ -414,7 +579,6 @@
                         endGame();
                     }
                 }, 1500);
-
             } else {
                 button.classList.add('wrong');
                 speak("Try again!");
@@ -433,8 +597,10 @@
 
         function endGame() {
             showScreen('win-screen');
+            const msg = gameMode === 'shapes' ? "You became a true Shapes Master!" : "You conquered the entire Solar System!";
+            document.getElementById('win-message').innerText = msg;
             document.getElementById('final-score').innerText = `Your Final Score: ${score} points`;
-            speak("Congratulations! You completed all 50 levels of the shapes challenge!");
+            speak(`Congratulations! ${msg}`);
         }
     </script>
 </body>
