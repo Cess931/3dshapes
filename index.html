@@ -32,6 +32,97 @@
             align-items: center;
             padding: 15px;
             color: #333;
+            transition: background 1s ease, color 1s ease;
+        }
+
+        body.morning {
+            background: radial-gradient(circle at top left, #fff6b5 0%, #fbbf24 40%, #fb7185 100%);
+            color: #2a1a05;
+            animation: sunPulse 12s ease-in-out infinite alternate;
+        }
+
+        body.morning::before {
+            content: '';
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff9c4 0%, #f59e0b 50%, rgba(251, 145, 32, 0.8) 100%);
+            box-shadow: 0 0 60px rgba(251, 145, 32, 0.5);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body.afternoon {
+            background: linear-gradient(135deg, #bfdbfe, #38bdf8);
+            color: #0f172a;
+            animation: calmBreeze 16s ease-in-out infinite alternate;
+        }
+
+        body.afternoon::before {
+            content: '';
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 0%, #fef9c3 50%, rgba(245, 158, 11, 0.8) 100%);
+            box-shadow: 0 0 25px rgba(255,255,255,0.6);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body.afternoon::after {
+            content: '';
+            position: fixed;
+            top: 80px;
+            right: 40px;
+            width: 160px;
+            height: 80px;
+            background: radial-gradient(circle at 35% 35%, #ffffff 38%, transparent 40%),
+                        radial-gradient(circle at 65% 40%, #ffffff 32%, transparent 35%),
+                        radial-gradient(circle at 50% 60%, #ffffff 30%, transparent 33%);
+            border-radius: 48% 52% 55% 45% / 45% 45% 55% 55%;
+            opacity: 0.9;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body.night {
+            background: radial-gradient(circle at top, #182133 0%, #020617 40%, #020816 100%);
+            color: #e2e8f0;
+            animation: nightGlow 18s ease-in-out infinite alternate;
+        }
+
+        body.night::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(circle, rgba(255,255,255,0.95) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255,255,255,0.65) 1px, transparent 1px);
+            background-size: 40px 40px, 80px 80px;
+            opacity: 0.28;
+            mix-blend-mode: screen;
+            animation: starTwinkle 6s linear infinite;
+        }
+
+        body.night::after {
+            content: '';
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 40%, #f8fafc 0%, #a5b4fc 45%, #2d3748 100%);
+            box-shadow: 0 0 40px rgba(248,250,252,0.2);
+            z-index: 0;
+            pointer-events: none;
         }
 
         .game-container {
@@ -43,6 +134,7 @@
             max-width: 500px;
             text-align: center;
             position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -124,6 +216,27 @@
         .display-area.color-mode { background: var(--color-bg); border-color: #cbd5e1; }
         .display-area.animal-mode { background: var(--animal-bg); border-color: #fde68a; }
         .display-area.fruit-mode { background: var(--fruit-bg); border-color: #a7f3d0; }
+
+        @keyframes sunPulse {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        @keyframes calmBreeze {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        @keyframes nightGlow {
+            0% { opacity: 0.9; }
+            50% { opacity: 1; }
+            100% { opacity: 0.95; }
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.22; transform: translateY(0); }
+            50% { opacity: 0.34; transform: translateY(-2px); }
+        }
 
         .shape {
             transition: transform 0.3s ease;
@@ -304,41 +417,743 @@
     </div>
 
     <script>
-        const shapes2D = [
-            { name: 'Circle', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#36d1dc" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Square', html: `<svg viewBox="0 0 120 120"><rect x="10" y="10" width="100" height="100" fill="#ff7675" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Triangle', html: `<svg viewBox="0 0 120 120"><polygon points="60,10 110,110 10,110" fill="#00cec9" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Rectangle', html: `<svg viewBox="0 0 140 120"><rect x="10" y="25" width="120" height="70" fill="#6c5ce7" stroke="#fff" stroke-width="3"/></svg>` }
-        ];
+       const shapes2D = [
+  {
+    id: 'circle',
+    name: 'Circle',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="50" fill="#36d1dc" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'oval',
+    name: 'Oval',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="70" cy="60" rx="50" ry="35" fill="#00cec9" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'triangle',
+    name: 'Triangle',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 110,110 10,110" fill="#55efc4" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'right-triangle',
+    name: 'Right Triangle',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="20,20 20,100 100,100" fill="#74b9ff" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'equilateral-triangle',
+    name: 'Equilateral Triangle',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,15 110,101 10,101" fill="#00b894" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'isosceles-triangle',
+    name: 'Isosceles Triangle',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 100,100 20,100" fill="#6c5ce7" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'scalene-triangle',
+    name: 'Scalene Triangle',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="30,15 110,90 15,105" fill="#fd79a8" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'square',
+    name: 'Square',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="15" y="15" width="90" height="90" fill="#ff7675" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'rectangle',
+    name: 'Rectangle',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="30" width="120" height="60" fill="#6c5ce7" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'rhombus',
+    name: 'Rhombus',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 110,60 60,110 10,60" fill="#f39c12" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'parallelogram',
+    name: 'Parallelogram',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="35,20 120,20 105,100 20,100" fill="#9b59b6" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'trapezoid',
+    name: 'Trapezoid',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,20 100,20 130,100 10,100" fill="#e67e22" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'kite',
+    name: 'Kite',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 95,60 60,110 25,60" fill="#16a085" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'pentagon',
+    name: 'Pentagon',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 105,45 88,105 32,105 15,45" fill="#3498db" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'hexagon',
+    name: 'Hexagon',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="35,10 85,10 110,60 85,110 35,110 10,60" fill="#27ae60" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'heptagon',
+    name: 'Heptagon',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 95,25 110,60 95,95 60,110 25,95 10,60" fill="#8e44ad" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'octagon',
+    name: 'Octagon',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,10 80,10 110,40 110,80 80,110 40,110 10,80 10,40" fill="#e74c3c" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'nonagon',
+    name: 'Nonagon',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 92,20 110,50 105,85 80,110 40,110 15,85 10,50 28,20" fill="#2ecc71" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'decagon',
+    name: 'Decagon',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 90,20 110,45 110,75 90,100 60,110 30,100 10,75 10,45 30,20" fill="#1abc9c" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'star',
+    name: 'Star',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 73,45 110,45 80,67 90,105 60,82 30,105 40,67 10,45 47,45" fill="#f1c40f" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'heart',
+    name: 'Heart',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <path d="M60 105 L15 55 A20 20 0 1 1 45 25 A20 20 0 1 1 75 25 A20 20 0 1 1 105 55 Z" fill="#ff4d6d" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'crescent',
+    name: 'Crescent',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <mask id="crescent-mask">
+          <rect width="100%" height="100%" fill="#ffffff" />
+          <circle cx="75" cy="50" r="35" fill="#000000" />
+        </mask>
+      </defs>
+      <circle cx="55" cy="60" r="40" fill="#f9ca24" stroke="#ffffff" stroke-width="3" mask="url(#crescent-mask)"/>
+    </svg>`
+  },
+  {
+    id: 'semicircle',
+    name: 'Semicircle',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 90 A40 40 0 0 1 100 90 Z" fill="#0984e3" stroke="#ffffff" stroke-width="3"/>
+    </svg>`
+  },
+  {
+    id: 'cross',
+    name: 'Cross',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <path d="M45,15 H75 V45 H105 V75 H75 V105 H45 V75 H15 V45 H45 Z" fill="#e84393" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"/>
+    </svg>`
+  },
+  {
+    id: 'arrow',
+    name: 'Arrow',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,10 110,60 80,60 80,110 40,110 40,60 10,60" fill="#00b894" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"/>
+    </svg>`
+  }
+];
 
-        const shapes3D = [
-            { name: 'Cube', html: `<div class="scene3d"><div class="cube"><div class="cube-face face-front"></div><div class="cube-face face-back"></div><div class="cube-face face-right"></div><div class="cube-face face-left"></div><div class="cube-face face-top"></div><div class="cube-face face-bottom"></div></div></div>` },
-            { name: 'Sphere', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="sphereGrad" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#a29bfe"/><stop offset="100%" stop-color="#6c5ce7"/></radialGradient></defs><circle cx="60" cy="60" r="50" fill="url(#sphereGrad)"/></svg>` }
-        ];
+      const shapes3D = [
+  {
+    id: 'cube',
+    name: 'Cube',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cube-top" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#4ea8de"/><stop offset="100%" stop-color="#90e0ef"/></linearGradient>
+        <linearGradient id="cube-front" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#0077b6"/><stop offset="100%" stop-color="#03045e"/></linearGradient>
+        <linearGradient id="cube-right" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0096c7"/><stop offset="100%" stop-color="#005f73"/></linearGradient>
+      </defs>
+      <polygon points="60,15 105,35 60,55 15,35" fill="url(#cube-top)"/>
+      <polygon points="15,35 60,55 60,105 15,85" fill="url(#cube-front)"/>
+      <polygon points="60,55 105,35 105,85 60,105" fill="url(#cube-right)"/>
+    </svg>`
+  },
+  {
+    id: 'sphere',
+    name: 'Sphere',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="sphere-grad" cx="35%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#d6bbfb"/>
+          <stop offset="40%" stop-color="#9b5de5"/>
+          <stop offset="100%" stop-color="#4a0e4e"/>
+        </radialGradient>
+      </defs>
+      <circle cx="60" cy="60" r="50" fill="url(#sphere-grad)"/>
+    </svg>`
+  },
+  {
+    id: 'cylinder',
+    name: 'Cylinder',
+    html: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cyl-body" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#1d3557"/><stop offset="30%" stop-color="#457b9d"/>
+          <stop offset="70%" stop-color="#a8dadc"/><stop offset="100%" stop-color="#1d3557"/>
+        </linearGradient>
+        <linearGradient id="cyl-top" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#a8dadc"/><stop offset="100%" stop-color="#f1faee"/></linearGradient>
+      </defs>
+      <rect x="25" y="25" width="70" height="80" fill="url(#cyl-body)"/>
+      <ellipse cx="60" cy="105" rx="35" ry="12" fill="#1d3557"/>
+      <ellipse cx="60" cy="25" rx="35" ry="12" fill="url(#cyl-body)"/>
+      <ellipse cx="60" cy="25" rx="33" ry="10" fill="url(#cyl-top)"/>
+    </svg>`
+  },
+  {
+    id: 'cone',
+    name: 'Cone',
+    html: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cone-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#e63946"/><stop offset="40%" stop-color="#ffb703"/>
+          <stop offset="85%" stop-color="#fb8500"/><stop offset="100%" stop-color="#d62828"/>
+        </linearGradient>
+      </defs>
+      <ellipse cx="60" cy="110" rx="35" ry="12" fill="#d62828"/>
+      <polygon points="60,15 95,110 25,110" fill="url(#cone-grad)"/>
+    </svg>`
+  },
+  {
+    id: 'cuboid',
+    name: 'Cuboid',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cuboid-top" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#bde0fe"/><stop offset="100%" stop-color="#a2d2ff"/></linearGradient>
+        <linearGradient id="cuboid-front" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4ea8de"/><stop offset="100%" stop-color="#005f73"/></linearGradient>
+        <linearGradient id="cuboid-right" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0077b6"/><stop offset="100%" stop-color="#03045e"/></linearGradient>
+      </defs>
+      <polygon points="35,25 115,25 130,45 50,45" fill="url(#cuboid-top)"/>
+      <polygon points="15,45 50,45 50,105 15,105" fill="url(#cuboid-front)"/>
+      <polygon points="50,45 130,45 130,105 50,105" fill="url(#cuboid-right)"/>
+    </svg>`
+  },
+  {
+    id: 'triangular-prism',
+    name: 'Triangular Prism',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="prism-left" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a7c957"/><stop offset="100%" stop-color="#386641"/></linearGradient>
+        <linearGradient id="prism-right" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6a994e"/><stop offset="100%" stop-color="#132a13"/></linearGradient>
+      </defs>
+      <polygon points="20,95 55,30 90,95" fill="url(#prism-left)"/>
+      <polygon points="55,30 125,45 125,100 90,95" fill="url(#prism-right)"/>
+    </svg>`
+  },
+  {
+    id: 'square-pyramid',
+    name: 'Square Pyramid',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="pyr-left" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffe3a8"/><stop offset="100%" stop-color="#ffb703"/></linearGradient>
+        <linearGradient id="pyr-right" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fb8500"/><stop offset="100%" stop-color="#d62828"/></linearGradient>
+      </defs>
+      <polygon points="60,15 20,90 65,105" fill="url(#pyr-left)"/>
+      <polygon points="60,15 65,105 105,85" fill="url(#pyr-right)"/>
+    </svg>`
+  },
+  {
+    id: 'tetrahedron',
+    name: 'Tetrahedron',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="tetra-left" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e0aaff"/><stop offset="100%" stop-color="#7b2cbf"/></linearGradient>
+        <linearGradient id="tetra-right" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5a189a"/><stop offset="100%" stop-color="#240046"/></linearGradient>
+      </defs>
+      <polygon points="60,15 15,95 65,105" fill="url(#tetra-left)"/>
+      <polygon points="60,15 65,105 105,90" fill="url(#tetra-right)"/>
+    </svg>`
+  },
+  {
+    id: 'hexagonal-prism',
+    name: 'Hexagonal Prism',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="hex-top" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" stop-color="#80cbc4"/><stop offset="100%" stop-color="#e0f2f1"/></linearGradient>
+        <linearGradient id="hex-f1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4db6ac"/><stop offset="100%" stop-color="#004d40"/></linearGradient>
+        <linearGradient id="hex-f2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#26a69a"/><stop offset="100%" stop-color="#00796b"/></linearGradient>
+      </defs>
+      <polygon points="35,20 75,20 95,40 75,60 35,60 15,40" fill="url(#hex-top)"/>
+      <polygon points="15,40 35,60 35,100 15,80" fill="url(#hex-f1)"/>
+      <polygon points="35,60 75,60 75,100 35,100" fill="url(#hex-f2)"/>
+      <polygon points="75,60 95,40 95,80 75,100" fill="url(#hex-f1)"/>
+    </svg>`
+  },
+  {
+    id: 'pentagonal-prism',
+    name: 'Pentagonal Prism',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="pent-top" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#d1c4e9"/><stop offset="100%" stop-color="#f3e5f5"/></linearGradient>
+        <linearGradient id="pent-f1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#9575cd"/><stop offset="100%" stop-color="#311b92"/></linearGradient>
+        <linearGradient id="pent-f2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#7e57c2"/><stop offset="100%" stop-color="#4527a0"/></linearGradient>
+      </defs>
+      <polygon points="55,15 85,30 75,60 35,60 25,30" fill="url(#pent-top)"/>
+      <polygon points="25,30 35,60 35,100 25,70" fill="url(#pent-f1)"/>
+      <polygon points="35,60 75,60 75,100 35,100" fill="url(#pent-f2)"/>
+      <polygon points="75,60 85,30 85,70 75,100" fill="url(#pent-f1)"/>
+    </svg>`
+  },
+  {
+    id: 'triangular-pyramid',
+    name: 'Triangular Pyramid',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,15 20,95 65,105" fill="#ffb74d"/>
+      <polygon points="60,15 65,105 100,95" fill="#f57c00"/>
+    </svg>`
+  },
+  {
+    id: 'hemisphere',
+    name: 'Hemisphere',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="hemi-base" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2196f3"/><stop offset="100%" stop-color="#0d47a1"/></linearGradient>
+        <radialGradient id="hemi-bowl" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#90caf9"/><stop offset="50%" stop-color="#42a5f5"/><stop offset="100%" stop-color="#0d47a1"/></radialGradient>
+      </defs>
+      <path d="M20,65 A40,40 0 0,0 100,65 Z" fill="url(#hemi-bowl)"/>
+      <ellipse cx="60" cy="65" rx="40" ry="12" fill="url(#hemi-base)"/>
+    </svg>`
+  },
+  {
+    id: 'frustum',
+    name: 'Frustum',
+    html: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="frust-body" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#5c4033"/><stop offset="40%" stop-color="#b5836d"/><stop offset="100%" stop-color="#3e2723"/></linearGradient>
+      </defs>
+      <ellipse cx="60" cy="110" rx="40" ry="12" fill="#3e2723"/>
+      <polygon points="40,35 80,35 100,110 20,110" fill="url(#frust-body)"/>
+      <ellipse cx="60" cy="35" rx="20" ry="7" fill="#b5836d"/>
+    </svg>`
+  },
+  {
+    id: 'ellipsoid',
+    name: 'Ellipsoid',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="ellip-grad" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#e0f7fa"/><stop offset="50%" stop-color="#00bcd4"/><stop offset="100%" stop-color="#006064"/></radialGradient>
+      </defs>
+      <ellipse cx="70" cy="60" rx="50" ry="35" fill="url(#ellip-grad)"/>
+    </svg>`
+  },
+  {
+    id: 'capsule',
+    name: 'Capsule',
+    html: `<svg viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="capsule-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff8a80"/><stop offset="40%" stop-color="#ff1744"/><stop offset="100%" stop-color="#b71c1c"/></linearGradient>
+      </defs>
+      <rect x="35" y="40" width="70" height="40" rx="20" fill="url(#capsule-grad)"/>
+    </svg>`
+  },
+  {
+    id: 'octahedron',
+    name: 'Octahedron',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="oct-top-left" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ea80fc"/><stop offset="100%" stop-color="#aa00ff"/></linearGradient>
+        <linearGradient id="oct-top-right" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#aa00ff"/><stop offset="100%" stop-color="#4a00e0"/></linearGradient>
+      </defs>
+      <polygon points="60,15 20,60 60,75" fill="url(#oct-top-left)"/>
+      <polygon points="60,15 60,75 100,60" fill="url(#oct-top-right)"/>
+      <polygon points="20,60 60,75 60,105" fill="#4a00e0"/>
+      <polygon points="60,75 100,60 60,105" fill="#310066"/>
+    </svg>`
+  },
+  {
+    id: 'dodecahedron',
+    name: 'Dodecahedron',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,15 85,30 75,60 45,60 35,30" fill="#90caf9"/>
+      <polygon points="35,30 45,60 20,80 5,50 15,25" fill="#42a5f5"/>
+      <polygon points="85,30 105,25 115,50 100,80 75,60" fill="#2196f3"/>
+      <polygon points="45,60 75,60 85,90 60,105 35,90" fill="#1e88e5"/>
+    </svg>`
+  },
+  {
+    id: 'icosahedron',
+    name: 'Icosahedron',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,15 35,45 85,45" fill="#a5d6a7"/>
+      <polygon points="35,45 15,80 50,100" fill="#66bb6a"/>
+      <polygon points="85,45 70,100 105,80" fill="#2e7d32"/>
+      <polygon points="35,45 85,45 50,100" fill="#4caf50"/>
+      <polygon points="85,45 50,100 70,100" fill="#388e3c"/>
+    </svg>`
+  },
+  {
+    id: 'torus',
+    name: 'Torus',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="torus-shading" cx="40%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#b39ddb"/><stop offset="60%" stop-color="#673ab7"/><stop offset="100%" stop-color="#311b92"/>
+        </radialGradient>
+        <mask id="donut-hole">
+          <rect width="100%" height="100%" fill="#ffffff" />
+          <ellipse cx="60" cy="60" rx="18" ry="12" fill="#000000" />
+        </mask>
+      </defs>
+      <ellipse cx="60" cy="60" rx="45" ry="35" fill="url(#torus-shading)" mask="url(#donut-hole)"/>
+    </svg>`
+  },
+  {
+    id: 'geodesic-sphere',
+    name: 'Geodesic Sphere',
+    html: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="geo-shading" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#e3f2fd"/><stop offset="70%" stop-color="#42a5f5"/><stop offset="100%" stop-color="#0d47a1"/></radialGradient>
+      </defs>
+      <circle cx="60" cy="60" r="48" fill="url(#geo-shading)"/>
+      <path d="M30,22 Q60,40 90,22 M16,40 Q60,65 104,40 M12,60 Q60,80 108,60 M16,80 Q60,95 104,80 M30,98 Q60,110 90,98" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+      <path d="M22,30 Q40,60 22,90 M40,16 Q65,60 40,104 M60,12 Q80,60 60,108 M80,16 Q95,60 80,104 M98,30 Q110,60 98,90" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.6"/>
+    </svg>`
+  }
+];
+       const planetsPool = [
+    // --- SOLAR SYSTEM ---
+    { name: 'Mercury', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="mercury" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#9ca3af"/><stop offset="60%" stop-color="#4b5563"/><stop offset="100%" stop-color="#111827"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#mercury)"/><circle cx="45" cy="45" r="4" fill="#374151" opacity="0.4"/><circle cx="75" cy="55" r="6" fill="#374151" opacity="0.3"/></svg>` },
+    { name: 'Venus', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="venus" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fef08a"/><stop offset="50%" stop-color="#ca8a04"/><stop offset="100%" stop-color="#451a03"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#venus)"/><path d="M20,50 Q60,40 100,50 M30,70 Q60,65 90,70" stroke="#a16207" stroke-width="3" fill="none" opacity="0.4"/></svg>` },
+    { name: 'Earth', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="earth" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="70%" stop-color="#1d4ed8"/><stop offset="100%" stop-color="#0f172a"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#earth)"/><path d="M35,35 Q45,20 65,30 T95,25 Q100,55 80,70 T40,75 Z" fill="#15803d" opacity="0.6"/><path d="M30,30 Q50,40 70,25" stroke="#ffffff" stroke-width="4" fill="none" opacity="0.4" stroke-linecap="round"/></svg>` },
+    { name: 'Mars', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="mars" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f87171"/><stop offset="70%" stop-color="#b91c1c"/><stop offset="100%" stop-color="#450a0a"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#mars)"/><circle cx="60" cy="15" r="8" fill="#fef2f2" opacity="0.4" filter="blur(1px)"/></svg>` },
+    { name: 'Jupiter', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="jupiter" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fed7aa"/><stop offset="60%" stop-color="#ea580c"/><stop offset="100%" stop-color="#431407"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#jupiter)"/><path d="M15,45 H105 M12,60 H108 M15,75 H105" stroke="#9a3412" stroke-width="4" opacity="0.5"/><circle cx="80" cy="68" r="7" fill="#9a3412" opacity="0.8"/></svg>` },
+    { name: 'Saturn', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="saturn" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fef08a"/><stop offset="70%" stop-color="#d97706"/><stop offset="100%" stop-color="#292524"/></radialGradient></defs><ellipse cx="60" cy="60" rx="58" ry="12" fill="none" stroke="#ca8a04" stroke-width="6" opacity="0.5" transform="rotate(-15 60 60)"/><circle cx="60" cy="60" r="40" fill="url(#saturn)"/><ellipse cx="60" cy="60" rx="58" ry="12" fill="none" stroke="#fef08a" stroke-width="3" opacity="0.7" transform="rotate(-15 60 60)"/></svg>` },
+    { name: 'Uranus', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="uranus" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#a5f3fc"/><stop offset="70%" stop-color="#0891b2"/><stop offset="100%" stop-color="#042f2e"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#uranus)"/><ellipse cx="60" cy="60" rx="52" ry="4" fill="none" stroke="#e0f2fe" stroke-width="1" opacity="0.3" transform="rotate(80 60 60)"/></svg>` },
+    { name: 'Neptune', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="neptune" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#60a5fa"/><stop offset="70%" stop-color="#1d4ed8"/><stop offset="100%" stop-color="#1e1b4b"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#neptune)"/><path d="M20,40 Q60,70 100,40" stroke="#2563eb" stroke-width="3" fill="none" opacity="0.5"/></svg>` },
+    
+    // --- DWARF PLANETS ---
+    { name: 'Pluto', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="pluto" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#ffedd5"/><stop offset="60%" stop-color="#854d0e"/><stop offset="100%" stop-color="#1c1917"/></radialGradient></defs><circle cx="60" cy="60" r="40" fill="url(#pluto)"/><path d="M45,55 Q60,75 75,55 T60,35 Z" fill="#ffedd5" opacity="0.3"/></svg>` },
+    { name: 'Eris', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="eris" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#e5e7eb"/><stop offset="100%" stop-color="#374151"/></radialGradient></defs><circle cx="60" cy="60" r="40" fill="url(#eris)"/></svg>` },
+    { name: 'Haumea', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="haumea" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f3f4f6"/><stop offset="100%" stop-color="#4b5563"/></radialGradient></defs><ellipse cx="60" cy="60" rx="46" ry="32" fill="url(#haumea)" transform="rotate(20 60 60)"/></svg>` },
+    { name: 'Makemake', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="makemake" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fdba74"/><stop offset="100%" stop-color="#7c2d12"/></radialGradient></defs><circle cx="60" cy="60" r="40" fill="url(#makemake)"/></svg>` },
+    { name: 'Ceres', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="ceres" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#9ca3af"/><stop offset="100%" stop-color="#374151"/></radialGradient></defs><circle cx="60" cy="60" r="38" fill="url(#ceres)"/></svg>` },
 
-        const planetsPool = [
-            { name: 'Mars', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="marsBase" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f87171"/><stop offset="100%" stop-color="#4c0519"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#marsBase)"/></svg>` },
-            { name: 'Earth', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="earGrad" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#1e3a8a"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#earGrad)"/><path d="M40,25 Q50,20 65,35 T90,30 Z" fill="#15803d" opacity="0.7"/></svg>` }
-        ];
+    // --- FAMOUS EXOPLANETS ---
+    // Kepler-22b (Water World)
+    { name: 'Kepler-22b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k22b" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#0369a1"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#k22b)"/></svg>` },
+    // Proxima Centauri b (Rocky Rocky/Red dwarf habitability)
+    { name: 'Proxima b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="proxima" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fca5a5"/><stop offset="70%" stop-color="#b91c1c"/><stop offset="100%" stop-color="#450a0a"/></radialGradient></defs><circle cx="60" cy="60" r="44" fill="url(#proxima)"/><path d="M20,60 Q60,30 100,60" stroke="#7f1d1d" stroke-width="3" fill="none" opacity="0.4"/></svg>` },
+    // HD 189733b (Rains glass planet - Deep Blue)
+    { name: 'HD 189733b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="hd189" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="60%" stop-color="#1d4ed8"/><stop offset="100%" stop-color="#030712"/></radialGradient></defs><circle cx="60" cy="60" r="47" fill="url(#hd189)"/><path d="M20,40 Q40,80 100,50" stroke="#60a5fa" stroke-width="2" fill="none" opacity="0.4"/></svg>` },
+    // 55 Cancri e (Diamond/Lava Planet)
+    { name: '55 Cancri e', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="cancri" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f97316"/><stop offset="50%" stop-color="#ef4444"/><stop offset="100%" stop-color="#111827"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#cancri)"/><path d="M30,30 L40,50 L25,60 L50,70 L70,40 Z" fill="#facc15" opacity="0.3" filter="blur(1px)"/></svg>` },
+    // WASP-12b (Egg-shaped Carbon Planet)
+    { name: 'WASP-12b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="wasp12" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#4b5563"/><stop offset="100%" stop-color="#030712"/></radialGradient></defs><ellipse cx="60" cy="60" rx="50" ry="38" fill="url(#wasp12)" transform="rotate(-10 60 60)"/></svg>` },
+    // Gliese 436b (Burning Ice)
+    { name: 'Gliese 436b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="gliese" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#e0f2fe"/><stop offset="60%" stop-color="#0284c7"/><stop offset="100%" stop-color="#0c4a6e"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#gliese)"/><circle cx="60" cy="60" r="48" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.5" filter="blur(2px)"/></svg>` },
+    // TRAPPIST-1e (Habitable zone rocky)
+    { name: 'TRAPPIST-1e', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="trap1e" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#cbd5e1"/><stop offset="60%" stop-color="#475569"/><stop offset="100%" stop-color="#0f172a"/></radialGradient></defs><circle cx="60" cy="60" r="44" fill="url(#trap1e)"/><path d="M40,40 Q50,50 60,30 T80,50" stroke="#15803d" stroke-width="2" fill="none" opacity="0.3"/></svg>` },
+    // TRAPPIST-1f (Water/Ice world)
+    { name: 'TRAPPIST-1f', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="trap1f" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#e0f7fa"/><stop offset="70%" stop-color="#006064"/><stop offset="100%" stop-color="#01579b"/></radialGradient></defs><circle cx="60" cy="60" r="44" fill="url(#trap1f)"/></svg>` },
+    // TRAPPIST-1g (Snowball planet)
+    { name: 'TRAPPIST-1g', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="trap1g" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#ffffff"/><stop offset="80%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#1e293b"/></radialGradient></defs><circle cx="60" cy="60" r="44" fill="url(#trap1g)"/></svg>` },
+    // Kepler-452b (Earth's Cousin)
+    { name: 'Kepler-452b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k452b" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#a7f3d0"/><stop offset="60%" stop-color="#047857"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#k452b)"/><path d="M30,40 T60,50 T90,30" fill="#166534" opacity="0.4"/></svg>` },
+    // Kepler-16b (Tatooine - circumbinary)
+    { name: 'Kepler-16b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k16b" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fde047"/><stop offset="70%" stop-color="#ca8a04"/><stop offset="100%" stop-color="#451a03"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#k16b)"/><ellipse cx="60" cy="60" rx="55" ry="6" fill="none" stroke="#fef08a" stroke-width="2" opacity="0.4" transform="rotate(5 60 60)"/></svg>` },
+    // Kepler-10b (Iron World)
+    { name: 'Kepler-10b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k10b" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#ef4444"/><stop offset="60%" stop-color="#7f1d1d"/><stop offset="100%" stop-color="#111827"/></radialGradient></defs><circle cx="60" cy="60" r="42" fill="url(#k10b)"/><path d="M20,60 Q60,80 100,60" stroke="#f97316" stroke-width="2" opacity="0.4"/></svg>` },
+    // TOI-700 d (Habitable Earth-sized)
+    { name: 'TOI-700 d', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="toi700" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#67e8f9"/><stop offset="70%" stop-color="#0369a1"/><stop offset="100%" stop-color="#0f172a"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#toi700)"/><path d="M40,30 Q70,40 80,60" stroke="#16a34a" stroke-width="4" fill="none" opacity="0.3"/></svg>` },
+    // LHS 1140 b (Super-Earth)
+    { name: 'LHS 1140 b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="lhs1140" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#94a3b8"/><stop offset="70%" stop-color="#334155"/><stop offset="100%" stop-color="#0f172a"/></radialGradient></defs><circle cx="60" cy="60" r="47" fill="url(#lhs1140)"/></svg>` },
+    // K2-18b (Hycean Planet - Water/Hydrogen)
+    { name: 'K2-18b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k2_18b" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#22d3ee"/><stop offset="70%" stop-color="#0e7490"/><stop offset="100%" stop-color="#164e63"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#k2_18b)"/><path d="M15,50 Q60,30 105,50" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.3"/></svg>` },
+    // Kepler-62f (Super-Earth Water World)
+    { name: 'Kepler-62f', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k62f" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#1e3a8a"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#k62f)"/></svg>` },
+    // Gliese 581g (Zarmina's World)
+    { name: 'Gliese 581g', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="g581g" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#cbd5e1"/><stop offset="70%" stop-color="#475569"/><stop offset="100%" stop-color="#1e293b"/></radialGradient></defs><circle cx="60" cy="60" r="44" fill="url(#g581g)"/><path d="M30,50 Q60,70 90,50" stroke="#15803d" stroke-width="2" fill="none" opacity="0.2"/></svg>` },
+    // WASP-17b (Puffy Planet / Retrograde)
+    { name: 'WASP-17b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="wasp17" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fbcfe8"/><stop offset="70%" stop-color="#db2777"/><stop offset="100%" stop-color="#4c0519"/></radialGradient></defs><circle cx="60" cy="60" r="49" fill="url(#wasp17)"/></svg>` },
+    // CoRoT-7b (Lava Ocean)
+    { name: 'CoRoT-7b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="corot7" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#dc2626"/><stop offset="60%" stop-color="#7f1d1d"/><stop offset="100%" stop-color="#171717"/></radialGradient></defs><circle cx="60" cy="60" r="43" fill="url(#corot7)"/><path d="M20,50 Q40,30 60,50 T100,50" stroke="#f97316" stroke-width="2" fill="none" opacity="0.5"/></svg>` },
+    // HAT-P-7b (Ruby & Sapphire clouds)
+    { name: 'HAT-P-7b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="hatp7" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#818cf8"/><stop offset="60%" stop-color="#4338ca"/><stop offset="100%" stop-color="#1e1b4b"/></radialGradient></defs><circle cx="60" cy="60" r="47" fill="url(#hatp7)"/><path d="M20,60 Q60,90 100,60" stroke="#ec4899" stroke-width="3" fill="none" opacity="0.3"/></svg>` },
+    // HD 209458b (Osiris - Evaporating)
+    { name: 'HD 209458b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="osiris" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#ffedd5"/><stop offset="70%" stop-color="#ea580c"/><stop offset="100%" stop-color="#2c1001"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#osiris)"/><path d="M10,40 Q-20,60 10,80" stroke="#f97316" stroke-width="4" fill="none" opacity="0.3"/></svg>` },
+    // TrES-2b (Darkest Planet)
+    { name: 'TrES-2b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="tres2b" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#1f2937"/><stop offset="80%" stop-color="#111827"/><stop offset="100%" stop-color="#030712"/></radialGradient></defs><circle cx="60" cy="60" r="47" fill="url(#tres2b)"/><path d="M30,40 Q60,50 90,40" stroke="#dc2626" stroke-width="1" fill="none" opacity="0.4"/></svg>` },
+    // GJ 1214b (Waterworld / Steam Planet)
+    { name: 'GJ 1214b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="gj1214" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#a5f3fc"/><stop offset="70%" stop-color="#0284c7"/><stop offset="100%" stop-color="#1e3a8a"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#gj1214)"/><circle cx="60" cy="60" r="48" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.4" filter="blur(1px)"/></svg>` },
+    // Kepler-444 (Very Ancient Planet)
+    { name: 'Kepler-444', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k444" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#ca8a04"/><stop offset="70%" stop-color="#78350f"/><stop offset="100%" stop-color="#1c1917"/></radialGradient></defs><circle cx="60" cy="60" r="42" fill="url(#k444)"/></svg>` },
+    // HD 106906b (Super-Jupiter Far Orbit)
+    { name: 'HD 106906b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="hd106" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fed7aa"/><stop offset="70%" stop-color="#c2410c"/><stop offset="100%" stop-color="#3a1207"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#hd106)"/></svg>` },
+    // WASP-19b (Hot Jupiter)
+    { name: 'WASP-19b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="wasp19" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f97316"/><stop offset="70%" stop-color="#7c2d12"/><stop offset="100%" stop-color="#0c0a09"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#wasp19)"/><path d="M20,45 H100" stroke="#ea580c" stroke-width="3" opacity="0.4"/></svg>` },
+    // Tau Ceti e (Super-Earth candidate)
+    { name: 'Tau Ceti e', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="tauceti" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="70%" stop-color="#475569"/><stop offset="100%" stop-color="#0f172a"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#tauceti)"/></svg>` },
+    // Ross 128 b (Quiet temperate rocky)
+    { name: 'Ross 128 b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="ross128" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f1f5f9"/><stop offset="70%" stop-color="#64748b"/><stop offset="100%" stop-color="#1e293b"/></radialGradient></defs><circle cx="60" cy="60" r="43" fill="url(#ross128)"/></svg>` },
+    // Teegarden's Star b (Earth-like index high)
+    { name: 'Teegarden b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="teegarden" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#93c5fd"/><stop offset="70%" stop-color="#1d4ed8"/><stop offset="100%" stop-color="#111827"/></radialGradient></defs><circle cx="60" cy="60" r="44" fill="url(#teegarden)"/><path d="M40,25 Q50,45 70,30" stroke="#16a34a" stroke-width="3" fill="none" opacity="0.4"/></svg>` },
+    // Wolf 1061c (Super-Earth near)
+    { name: 'Wolf 1061c', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="wolf" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#cbd5e1"/><stop offset="70%" stop-color="#475569"/><stop offset="100%" stop-color="#111827"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#wolf)"/></svg>` },
+    // Gliese 832c (Glaciated Super-Earth)
+    { name: 'Gliese 832c', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="g832c" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#ffffff"/><stop offset="70%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#0f172a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#g832c)"/></svg>` },
+    // K2-72e (Habitable M-dwarf host)
+    { name: 'K2-72e', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k272" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fed7aa"/><stop offset="70%" stop-color="#7c2d12"/><stop offset="100%" stop-color="#1e1b4b"/></radialGradient></defs><circle cx="60" cy="60" r="43" fill="url(#k272)"/></svg>` },
+    // Kepler-186f (First Earth-sized in HZ)
+    { name: 'Kepler-186f', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k186f" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fca5a5"/><stop offset="70%" stop-color="#991b1b"/><stop offset="100%" stop-color="#3f1312"/></radialGradient></defs><circle cx="60" cy="60" r="44" fill="url(#k186f)"/><path d="M35,35 Q60,50 85,35" stroke="#166534" stroke-width="2" fill="none" opacity="0.3"/></svg>` },
+    // Kepler-296f (Water-world candidate)
+    { name: 'Kepler-296f', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k296f" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#a5f3fc"/><stop offset="70%" stop-color="#0369a1"/><stop offset="100%" stop-color="#0c4a6e"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#k296f)"/></svg>` },
+    // Kepler-442b (More habitable than Earth?)
+    { name: 'Kepler-442b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k442b" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="70%" stop-color="#047857"/><stop offset="100%" stop-color="#022c22"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#k442b)"/><path d="M25,40 Q50,60 95,45" stroke="#0369a1" stroke-width="3" fill="none" opacity="0.3"/></svg>` },
+    // Kepler-69c (Super-Venus)
+    { name: 'Kepler-69c', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k69c" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fef9c3"/><stop offset="70%" stop-color="#ca8a04"/><stop offset="100%" stop-color="#451a03"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#k69c)"/></svg>` },
+    // Kepler-102e (Sub-Earth rocky)
+    { name: 'Kepler-102e', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="k102e" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#d1d5db"/><stop offset="100%" stop-color="#374151"/></radialGradient></defs><circle cx="60" cy="60" r="40" fill="url(#k102e)"/></svg>` },
+    // EPIC 201838339 b (Dense rocky)
+    { name: 'EPIC 201838 b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="epic" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#9a3412"/><stop offset="100%" stop-color="#292524"/></radialGradient></defs><circle cx="60" cy="60" r="44" fill="url(#epic)"/></svg>` },
+    // Gliese 667 Cc (Super-Earth in triple system)
+    { name: 'Gliese 667 Cc', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="g667" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#fca5a5"/><stop offset="60%" stop-color="#b91c1c"/><stop offset="100%" stop-color="#311005"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#g667)"/><path d="M30,40 Q60,30 90,50" stroke="#047857" stroke-width="2" fill="none" opacity="0.3"/></svg>` },
+    // TOI-561 b (Ancient Rocky Super-Earth)
+    { name: 'TOI-561 b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="toi561" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="70%" stop-color="#78350f"/><stop offset="100%" stop-color="#1c1917"/></radialGradient></defs><circle cx="60" cy="60" r="44" fill="url(#toi561)"/><path d="M20,60 Q60,40 100,60" stroke="#b91c1c" stroke-width="2" fill="none" opacity="0.4"/></svg>` },
+    // WASP-107b (Cotton Candy Planet)
+    { name: 'WASP-107b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="wasp107" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#ddd6fe"/><stop offset="60%" stop-color="#c084fc"/><stop offset="100%" stop-color="#581c87"/></radialGradient></defs><circle cx="60" cy="60" r="49" fill="url(#wasp107)"/><path d="M15,45 Q60,65 105,45" stroke="#f472b6" stroke-width="3" fill="none" opacity="0.4"/></svg>` },
+    // LTT 9779 b (Ultra-hot Neptune Mirror)
+    { name: 'LTT 9779 b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="ltt9779" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#ffffff"/><stop offset="40%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#334155"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#ltt9779)"/><circle cx="60" cy="60" r="46" fill="none" stroke="#e2e8f0" stroke-width="2" opacity="0.8"/></svg>` },
+    // HD 219134 b (Super-Earth rich in Ruby/Sapphire)
+    { name: 'HD 219134 b', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="hd219" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f472b6"/><stop offset="70%" stop-color="#be185d"/><stop offset="100%" stop-color="#4c0519"/></radialGradient></defs><circle cx="60" cy="60" r="45" fill="url(#hd219)"/><path d="M30,30 L45,20 L60,45 Z" fill="#ffffff" opacity="0.2"/></svg>` }
+];
 
         const colorsPool = [
-            { name: 'Red', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="redG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#redG)" stroke="#fff" stroke-width="2"/></svg>` },
-            { name: 'Blue', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="blueG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1e3a8a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#blueG)" stroke="#fff" stroke-width="2"/></svg>` },
-            { name: 'Green', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="greenG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#greenG)" stroke="#fff" stroke-width="2"/></svg>` },
-            { name: 'Yellow', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="yellowG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#facc15"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#yellowG)" stroke="#fff" stroke-width="2"/></svg>` }
-        ];
+    // 1-10: Basic & Bright Colors
+    { name: 'Red', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="redG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#redG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Blue', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="blueG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1e3a8a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#blueG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Green', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="greenG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#greenG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Yellow', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="yellowG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#facc15"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#yellowG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Orange', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="orangeG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#7c2d12"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#orangeG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Purple', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="purpleG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#4c1d95"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#purpleG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Pink', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="pinkG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#701a75"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#pinkG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Cyan', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="cyanG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#164e63"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#cyanG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Teal', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="tealG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#115e59"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#tealG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Indigo', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="indigoG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#1e1b4b"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#indigoG)" stroke="#fff" stroke-width="2"/></svg>` },
 
-        const animalsPool = [
-            { name: 'Cat', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="65" r="35" fill="#f59e0b"/><polygon points="32,42 45,15 55,38" fill="#b45309"/><polygon points="88,42 75,15 65,38" fill="#b45309"/><circle cx="48" cy="55" r="4" fill="#000"/><circle cx="72" cy="55" r="4" fill="#000"/><path d="M52,72 Q60,78 68,72" fill="none" stroke="#000" stroke-width="2"/></svg>` },
-            { name: 'Frog', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="70" rx="40" ry="28" fill="#22c55e"/><circle cx="42" cy="45" r="12" fill="#22c55e"/><circle cx="78" cy="45" r="12" fill="#22c55e"/><circle cx="42" cy="45" r="5" fill="#000"/><circle cx="78" cy="45" r="5" fill="#000"/><path d="M45,72 Q60,82 75,72" fill="none" stroke="#14532d" stroke-width="3"/></svg>` },
-            { name: 'Panda', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="65" r="38" fill="#fff" stroke="#ccc" stroke-width="1"/><circle cx="32" cy="35" r="14" fill="#000"/><circle cx="88" cy="35" r="14" fill="#000"/><ellipse cx="46" cy="58" rx="10" ry="14" fill="#000"/><ellipse cx="74" cy="58" rx="10" ry="14" fill="#000"/><circle cx="46" cy="54" r="4" fill="#fff"/><circle cx="74" cy="54" r="4" fill="#fff"/><polygon points="60,72 55,67 65,67" fill="#000"/></svg>` }
-        ];
+    // 11-20: Nature & Jewel Tones
+    { name: 'Lime', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="limeG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#84cc16"/><stop offset="100%" stop-color="#365314"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#limeG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Emerald', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="emeraldG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#022c22"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#emeraldG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Rose', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="roseG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#f43f5e"/><stop offset="100%" stop-color="#4c0519"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#roseG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Amber', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="amberG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#amberG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Violet', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="violetG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#2e1065"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#violetG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Fuchsia', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="fuchsiaG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#d946ef"/><stop offset="100%" stop-color="#4a044e"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#fuchsiaG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Sky Blue', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="skyG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#0ea5e9"/><stop offset="100%" stop-color="#0c4a6e"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#skyG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Mint', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="mintG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#mintG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Coral', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="coralG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ff7f50"/><stop offset="100%" stop-color="#7a2204"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#coralG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Crimson', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="crimsonG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#450a0a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#crimsonG)" stroke="#fff" stroke-width="2"/></svg>` },
 
-        const fruitsPool = [
-            { name: 'Apple', html: `<svg viewBox="0 0 120 120"><path d="M60,95 C30,95 20,70 20,48 C20,25 42,22 60,35 C78,22 100,25 100,48 C100,70 90,95 60,95 Z" fill="#dc2626"/><path d="M60,32 Q64,12 75,10" fill="none" stroke="#451a03" stroke-width="3"/><path d="M62,22 Q75,15 80,24 Z" fill="#166534"/></svg>` },
-            { name: 'Orange', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="orG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#c2410c"/></radialGradient></defs><circle cx="60" cy="65" r="40" fill="url(#orG)"/><path d="M60,25 Q58,14 52,12" fill="none" stroke="#451a03" stroke-width="3"/><circle cx="50" cy="52" r="1.5" fill="#fff" opacity="0.5"/></svg>` },
-            { name: 'Watermelon', html: `<svg viewBox="0 0 120 120"><path d="M20,50 A40,40 0 0,0 100,50 Z" fill="#166534"/><path d="M25,48 A35,35 0 0,0 95,48 Z" fill="#f43f5e"/><circle cx="45" cy="65" r="2" fill="#000"/><circle cx="60" cy="72" r="2" fill="#000"/><circle cx="75" cy="65" r="2" fill="#000"/></svg>` }
-        ];
+    // 21-30: Metallic & Dark Shades
+    { name: 'Gold', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="goldG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#5c4033"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#goldG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Silver', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="silverG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#d1d5db"/><stop offset="100%" stroke-color="#fff" stop-color="#374151"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#silverG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Charcoal', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="charcoalG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#4b5563"/><stop offset="100%" stop-color="#111827"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#charcoalG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Olive', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="oliveG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#808000"/><stop offset="100%" stop-color="#333300"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#oliveG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Maroon', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="maroonG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#800000"/><stop offset="100%" stop-color="#310000"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#maroonG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Navy', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="navyG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#000080"/><stop offset="100%" stop-color="#000033"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#navyG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Lavender', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="lavenderG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#3b0764"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#lavenderG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Magenta', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="magentaG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ff00ff"/><stop offset="100%" stop-color="#550055"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#magentaG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Turquoise', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="turquoiseG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#0f766e"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#turquoiseG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Plum', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="plumG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#dda0dd"/><stop offset="100%" stop-color="#4a004a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#plumG)" stroke="#fff" stroke-width="2"/></svg>` },
+
+    // 31-40: Earth & Pastel Tones
+    { name: 'Peach', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="peachG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ffdab9"/><stop offset="100%" stop-color="#7c2d12"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#peachG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Salmon', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="salmonG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#fa8072"/><stop offset="100%" stop-color="#6b211a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#salmonG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Chocolate', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="chocolateG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#d2691e"/><stop offset="100%" stop-color="#4a1d00"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#chocolateG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Bronze', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="bronzeG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#cd7f32"/><stop offset="100%" stop-color="#4a2700"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#bronzeG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Copper', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="copperG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#b87333"/><stop offset="100%" stop-color="#3d1d00"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#copperG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Rust', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="rustG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#b7410e"/><stop offset="100%" stop-color="#4a1400"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#rustG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Mustard', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="mustardG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#e1ad01"/><stop offset="100%" stop-color="#4a3b00"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#mustardG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Forest Green', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="forestG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#14532d"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#forestG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Midnight Blue', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="midnightG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#030712"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#midnightG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Lavender Blush', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="blushG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#fff0f5"/><stop offset="100%" stop-color="#4a3b40"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#blushG)" stroke="#fff" stroke-width="2"/></svg>` },
+
+    // 41-50: Premium & Unique Tones
+    { name: 'Orchid', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="orchidG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#da70d6"/><stop offset="100%" stop-color="#4a154b"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#orchidG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Periwinkle', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="periwinkleG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ccccff"/><stop offset="100%" stop-color="#222266"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#periwinkleG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Apricot', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="apricotG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#apricotG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Tangerine', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="tangerineG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#f95d16"/><stop offset="100%" stop-color="#5c1400"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#tangerineG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Burgundy', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="burgundyG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#800020"/><stop offset="100%" stop-color="#2b000a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#burgundyG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Mauve', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="mauveG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#e0b0ff"/><stop offset="100%" stop-color="#3a1a4a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#mauveG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Slate Gray', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="slateG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#708090"/><stop offset="100%" stop-color="#2f4f4f"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#slateG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Khaki', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="khakiG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#f0e68c"/><stop offset="100%" stop-color="#4a461b"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#khakiG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Beige', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="beigeG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#f5f5dc"/><stop offset="100%" stop-color="#4a4a3a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#beigeG)" stroke="#fff" stroke-width="2"/></svg>` },
+    { name: 'Coffee', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="coffeeG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#6f4e37"/><stop offset="100%" stop-color="#2b1d12"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#coffeeG)" stroke="#fff" stroke-width="2"/></svg>` }
+];
+
+       const animalsPool = [
+  // ==========================================
+  // --- APES, CANINES & FELINES (1-10) ---
+  // ==========================================
+  { name: 'Lion', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="lnM" cx="50%" cy="50%" r="50%"><stop offset="60%" stop-color="#78350f"/><stop offset="100%" stop-color="#451a03"/></radialGradient><linearGradient id="lnF" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#d97706"/></linearGradient></defs><path d="M60,12 C25,12 12,35 12,65 C12,95 30,112 60,112 C90,112 108,95 108,65 C108,35 95,12 60,12 Z" fill="url(#lnM)"/><path d="M30,28 Q18,12 32,5 Z M90,28 Q102,12 88,5 Z" fill="#451a03"/><path d="M60,25 C38,25 32,42 32,70 C32,95 42,104 60,104 C78,104 88,95 88,70 C88,42 82,25 60,25 Z" fill="url(#lnF)"/><path d="M42,50 Q48,46 54,50 M78,50 Q72,46 66,50" fill="none" stroke="#451a03" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="46" cy="56" rx="5" ry="7" fill="#1e293b"/><ellipse cx="74" cy="56" rx="5" ry="7" fill="#1e293b"/><circle cx="45" cy="54" r="1.5" fill="#fff"/><circle cx="73" cy="54" r="1.5" fill="#fff"/><path d="M44,72 C44,88 52,90 60,90 C68,90 76,88 76,72 C76,66 68,64 60,64 C52,64 44,66 44,72 Z" fill="#fef08a" opacity="0.8"/><polygon points="60,70 52,62 68,62" fill="#1e293b"/><path d="M52,78 Q60,84 68,78 M60,70 L60,80" fill="none" stroke="#451a03" stroke-width="2"/><path d="M28,74 L10,76 M28,80 L8,84 M92,74 L110,76 M92,80 L112,84" fill="none" stroke="#fef08a" opacity="0.5" stroke-width="1.5"/></svg>` },
+  { name: 'Tiger', html: `<svg viewBox="0 0 120 120"><defs><linearGradient id="tgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ea580c"/><stop offset="100%" stop-color="#9a3412"/></linearGradient></defs><path d="M32,35 L20,15 L40,28 Z M88,35 L100,15 L80,28 Z" fill="#9a3412"/><path d="M60,25 C32,25 24,42 24,72 C24,98 38,108 60,108 C82,108 96,98 96,72 C96,42 88,25 60,25 Z" fill="url(#tgG)"/><path d="M24,45 L42,48 M24,60 L45,61 M24,75 L40,73 M96,45 L78,48 M96,60 L75,61 M96,75 L80,73 M46,26 L52,42 M74,26 L68,42 M60,25 L60,38" fill="none" stroke="#111827" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="44" cy="58" rx="6" ry="8" fill="#ca8a04"/><ellipse cx="76" cy="58" rx="6" ry="8" fill="#ca8a04"/><ellipse cx="44" cy="58" rx="3" ry="5" fill="#000"/><ellipse cx="76" cy="58" rx="3" ry="5" fill="#000"/><path d="M46,74 C46,92 74,92 74,74 C74,68 60,66 60,66 C60,66 46,68 46,74 Z" fill="#fff"/><polygon points="60,72 54,64 66,64" fill="#111827"/><path d="M54,80 Q60,85 66,80" fill="none" stroke="#000" stroke-width="2"/></svg>` },
+  { name: 'Cat', html: `<svg viewBox="0 0 120 120"><defs><linearGradient id="ctG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#475569"/><stop offset="100%" stop-color="#0f172a"/></linearGradient></defs><path d="M26,32 L12,5 L34,22 Z" fill="#0f172a"/><path d="M94,32 L108,5 L86,22 Z" fill="#0f172a"/><path d="M16,12 L28,24 L18,26 Z" fill="#fda4af" opacity="0.6"/><path d="M104,12 L92,24 L102,26 Z" fill="#fda4af" opacity="0.6"/><ellipse cx="60" cy="68" rx="36" ry="32" fill="url(#ctG)"/><ellipse cx="44" cy="56" rx="7" ry="10" fill="#a3e635"/><ellipse cx="76" cy="56" rx="7" ry="10" fill="#a3e635"/><line x1="44" y1="46" x2="44" y2="66" stroke="#000" stroke-width="2"/><line x1="76" y1="46" x2="76" y2="66" stroke="#000" stroke-width="2"/><circle cx="42" cy="52" r="1.5" fill="#fff"/><circle cx="74" cy="52" r="1.5" fill="#fff"/><ellipse cx="60" cy="74" rx="14" ry="10" fill="#fff" opacity="0.15"/><polygon points="60,72 55,66 65,66" fill="#f43f5e"/><path d="M52,78 Q60,84 68,78 M60,72 L60,78" fill="none" stroke="#0f172a" stroke-width="2"/><path d="M26,76 L4,74 M26,82 L2,83 M94,76 L116,74 M94,82 L118,83" fill="none" stroke="#cbd5e1" stroke-width="1.2" opacity="0.7"/></svg>` },
+  { name: 'Dog (German Shepherd)', html: `<svg viewBox="0 0 120 120"><path d="M30,35 L20,2 Q40,15 44,42 Z" fill="#1e293b"/><path d="M90,35 L100,2 Q80,15 76,42 Z" fill="#1e293b"/><path d="M32,15 L38,32 L28,30 Z" fill="#fca5a5" opacity="0.5"/><path d="M88,15 L82,32 L92,30 Z" fill="#fca5a5" opacity="0.5"/><ellipse cx="60" cy="65" rx="34" ry="30" fill="#d97706"/><path d="M42,50 Q60,34 78,50 L70,95 L50,95 Z" fill="#1e293b"/><circle cx="44" cy="54" r="5" fill="#ca8a04"/><circle cx="76" cy="54" r="5" fill="#ca8a04"/><circle cx="44" cy="54" r="2.5" fill="#000"/><circle cx="76" cy="54" r="2.5" fill="#000"/><ellipse cx="60" cy="84" rx="10" ry="7" fill="#000"/><path d="M52,92 Q60,98 68,92" fill="none" stroke="#000" stroke-width="2.5"/></svg>` },
+  { name: 'Wolf', html: `<svg viewBox="0 0 120 120"><defs><linearGradient id="wfG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#475569"/></linearGradient></defs><polygon points="25,32 15,5 38,24" fill="#334155"/><polygon points="95,32 105,5 82,24" fill="#334155"/><path d="M22,54 Q60,112 60,112 Q60,112 98,54 Q94,30 60,30 Q26,30 22,54 Z" fill="url(#wfG)"/><path d="M40,42 L60,88 L80,42 Z" fill="#1e293b" opacity="0.15"/><ellipse cx="44" cy="56" rx="6" ry="4" fill="#facc15" transform="rotate(-10 44 56)"/><ellipse cx="76" cy="56" rx="6" ry="4" fill="#facc15" transform="rotate(10 76 56)"/><ellipse cx="44" cy="56" rx="2.5" ry="2.5" fill="#000"/><ellipse cx="76" cy="56" rx="2.5" ry="2.5" fill="#000"/><ellipse cx="60" cy="90" rx="7" ry="5" fill="#000"/><path d="M52,96 Q60,102 68,96" fill="none" stroke="#1e293b" stroke-width="2"/></svg>` },
+  { name: 'Fox', html: `<svg viewBox="0 0 120 120"><polygon points="20,25 10,2 35,18" fill="#b45309"/><polygon points="100,25 110,2 85,18" fill="#b45309"/><path d="M16,52 C16,84 60,114 60,114 C60,114 104,84 104,52 C104,32 84,24 60,24 C36,24 16,32 16,52 Z" fill="#ea580c"/><path d="M16,52 C16,74 44,84 60,114 C76,84 104,74 104,52 C104,64 84,76 60,76 C36,76 16,64 16,52 Z" fill="#fff"/><ellipse cx="40" cy="54" rx="5" ry="7" fill="#1e293b"/><ellipse cx="80" cy="54" rx="5" ry="7" fill="#1e293b"/><circle cx="60" cy="110" r="4.5" fill="#000"/></svg>` },
+  { name: 'Cheetah', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="65" r="35" fill="#eab308"/><circle cx="34" cy="36" r="8" fill="#ca8a04"/><circle cx="86" cy="36" r="8" fill="#ca8a04"/><path d="M42,56 Q46,70 50,78 M78,56 Q74,70 70,78" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"/><circle cx="44" cy="52" r="4.5" fill="#854d0e"/><circle cx="76" cy="52" r="4.5" fill="#854d0e"/><circle cx="44" cy="52" r="2" fill="#000"/><circle cx="76" cy="52" r="2" fill="#000"/><path d="M48,82 C48,92 72,92 72,82 Z" fill="#fff"/><ellipse cx="60" cy="80" rx="6" ry="4" fill="#000"/><circle cx="40" cy="40" r="2" fill="#000"/><circle cx="80" cy="40" r="2" fill="#000"/><circle cx="60" cy="38" r="2.5" fill="#000"/><circle cx="34" cy="74" r="3" fill="#000"/><circle cx="86" cy="74" r="2" fill="#000"/><circle cx="62" cy="98" r="2.5" fill="#000"/></svg>` },
+  { name: 'Bear', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="brG" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#78350f"/><stop offset="100%" stop-color="#451a03"/></radialGradient></defs><circle cx="30" cy="35" r="14" fill="#451a03"/><circle cx="90" cy="35" r="14" fill="#451a03"/><circle cx="60" cy="70" r="42" fill="url(#brG)"/><ellipse cx="60" cy="85" rx="18" ry="14" fill="#d97706" opacity="0.7"/><ellipse cx="44" cy="58" rx="4" ry="6" fill="#000"/><ellipse cx="76" cy="58" rx="4" ry="6" fill="#000"/><ellipse cx="60" cy="78" rx="7" ry="5" fill="#000"/><path d="M52,86 Q60,92 68,86" fill="none" stroke="#451a03" stroke-width="2.5" stroke-linecap="round"/></svg>` },
+  { name: 'Panda', html: `<svg viewBox="0 0 120 120"><circle cx="28" cy="32" r="16" fill="#111827"/><circle cx="92" cy="32" r="16" fill="#111827"/><circle cx="60" cy="70" r="42" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/><ellipse cx="42" cy="62" rx="11" ry="16" fill="#111827" transform="rotate(-20 42 62)"/><ellipse cx="78" cy="62" rx="11" ry="16" fill="#111827" transform="rotate(20 78 62)"/><circle cx="45" cy="58" r="4.5" fill="#fff"/><circle cx="75" cy="58" r="4.5" fill="#fff"/><circle cx="45" cy="58" r="2" fill="#000"/><circle cx="75" cy="58" r="2" fill="#000"/><ellipse cx="60" cy="84" rx="14" ry="10" fill="#e2e8f0" opacity="0.5"/><polygon points="60,80 54,73 66,73" fill="#111827"/><path d="M52,86 Q60,92 68,86" fill="none" stroke="#000" stroke-width="2"/></svg>` },
+  { name: 'Gorilla', html: `<svg viewBox="0 0 120 120"><path d="M24,50 C24,25 36,15 60,15 C84,15 96,25 96,50 C96,82 86,108 60,108 C34,108 24,82 24,50 Z" fill="#1e293b"/><path d="M34,44 C34,34 44,28 60,28 C76,28 86,34 86,44 C86,64 78,74 60,74 C42,74 34,64 34,44 Z" fill="#475569"/><ellipse cx="46" cy="42" rx="4" ry="5" fill="#000"/><ellipse cx="74" cy="42" rx="4" ry="5" fill="#000"/><path d="M40,34 Q46,31 52,35 M80,34 Q74,31 68,35" fill="none" stroke="#0f172a" stroke-width="2.5"/><ellipse cx="60" cy="54" rx="8" ry="5" fill="#1e293b"/><ellipse cx="56" cy="54" rx="1.5" ry="2" fill="#000"/><ellipse cx="64" cy="54" rx="1.5" ry="2" fill="#000"/><path d="M48,64 Q60,68 72,64" fill="none" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/></svg>` },
+
+  // ==========================================
+  // --- LARGE HOOFED HERBIVORES (11-20) ---
+  // ==========================================
+  { name: 'Elephant', html: `<svg viewBox="0 0 120 120"><defs><linearGradient id="elG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#475569"/></linearGradient></defs><path d="M12,62 C12,42 22,35 38,42 Z M108,62 C108,42 98,35 82,42 Z" fill="#475569"/><circle cx="60" cy="65" r="38" fill="url(#elG)"/><ellipse cx="44" cy="58" rx="4" ry="6" fill="#111827"/><ellipse cx="76" cy="58" rx="4" ry="6" fill="#111827"/><path d="M50,72 C50,118 64,120 66,108 C68,96 64,86 64,72 Z" fill="url(#elG)" stroke="#334155" stroke-width="1"/><path d="M44,74 L46,90 L54,76 Z M76,74 L74,90 L66,76 Z" fill="#fff" stroke="#cbd5e1"/></svg>` },
+  { name: 'Rhinoceros', html: `<svg viewBox="0 0 120 120"><path d="M26,45 L14,35 L24,52 Z M94,45 L106,35 L96,52 Z" fill="#475569"/><ellipse cx="60" cy="70" rx="38" ry="32" fill="#64748b"/><path d="M60,82 L60,40 Q65,65 72,74 Z" fill="#94a3b8" stroke="#475569"/><path d="M58,82 L55,58 Q58,72 62,76 Z" fill="#94a3b8" opacity="0.7"/><ellipse cx="38" cy="64" rx="3" ry="5" fill="#000"/><ellipse cx="82" cy="64" rx="3" ry="5" fill="#000"/><ellipse cx="60" cy="92" rx="14" ry="10" fill="#475569"/><circle cx="52" cy="92" r="2" fill="#000"/><circle cx="68" cy="92" r="2" fill="#000"/></svg>` },
+  { name: 'Hippopotamus', html: `<svg viewBox="0 0 120 120"><circle cx="34" cy="35" r="8" fill="#475569"/><circle cx="86" cy="35" r="8" fill="#475569"/><ellipse cx="60" cy="60" rx="36" ry="28" fill="#64748b"/><ellipse cx="60" cy="85" rx="42" ry="24" fill="#475569"/><ellipse cx="42" cy="52" rx="3" ry="4" fill="#000"/><ellipse cx="82" cy="52" rx="3" ry="4" fill="#000"/><ellipse cx="44" cy="82" rx="5" ry="3" fill="#1e293b"/><ellipse cx="76" cy="82" rx="5" ry="3" fill="#1e293b"/></svg>` },
+  { name: 'Giraffe', html: `<svg viewBox="0 0 120 120"><path d="M46,30 L40,4 L48,4 Z M74,30 L80,4 L72,4 Z" fill="#78350f"/><circle cx="40" cy="3" r="3" fill="#451a03"/><circle cx="80" cy="3" r="3" fill="#451a03"/><path d="M34,44 Q20,38 28,26 Q40,32 42,46 Z M86,44 Q100,38 92,26 Q80,32 78,46 Z" fill="#b45309"/><ellipse cx="60" cy="68" rx="28" ry="38" fill="#f59e0b"/><ellipse cx="60" cy="86" rx="20" ry="16" fill="#fef08a"/><ellipse cx="46" cy="56" rx="4" ry="6" fill="#000"/><ellipse cx="74" cy="56" rx="4" ry="6" fill="#000"/><circle cx="48" cy="82" r="2.5" fill="#b45309"/><circle cx="72" cy="82" r="2.5" fill="#b45309"/><path d="M44,48 B M44,68 R8 fill="#78350f" opacity="0.3" d="M42,54 C36,54 38,64 46,62 Z" fill="#78350f"/><path d="M72,64 C76,52 64,56 68,68 Z" fill="#78350f"/></svg>` },
+  { name: 'Zebra', html: `<svg viewBox="0 0 120 120"><path d="M32,32 L20,10 L36,24 Z M88,32 L100,10 L84,24 Z" fill="#111827"/><ellipse cx="60" cy="65" rx="34" ry="30" fill="#fff" stroke="#111827" stroke-width="1.5"/><path d="M26,50 L46,54 M26,64 L48,66 M26,78 L42,76 M94,50 L74,54 M94,64 L72,66 M94,78 L78,76 M60,35 L60,55" stroke="#111827" stroke-width="4" stroke-linecap="round"/><ellipse cx="60" cy="85" rx="16" ry="14" fill="#111827"/><ellipse cx="44" cy="56" rx="4" ry="6" fill="#111827"/><ellipse cx="76" cy="56" rx="4" ry="6" fill="#111827"/></svg>` },
+  { name: 'Horse', html: `<svg viewBox="0 0 120 120"><path d="M38,32 L28,8 L44,24 Z M82,32 L92,8 L76,24 Z" fill="#451a03"/><path d="M34,50 Q60,18 86,50 L76,102 L44,102 Z" fill="#78350f"/><path d="M52,24 Q60,40 50,70 L58,70 Z" fill="#fff"/><ellipse cx="44" cy="54" rx="4" ry="6" fill="#000"/><ellipse cx="76" cy="54" rx="4" ry="6" fill="#000"/><ellipse cx="60" cy="94" rx="14" ry="9" fill="#451a03"/><circle cx="52" cy="94" r="2" fill="#000"/><circle cx="68" cy="94" r="2" fill="#000"/></svg>` },
+  { name: 'Camel', html: `<svg viewBox="0 0 120 120"><path d="M35,38 L28,15 L42,30 Z" fill="#9a3412"/><ellipse cx="60" cy="74" rx="36" ry="28" fill="#b45309"/><path d="M60,46 C40,46 32,54 32,70 L52,70 Z" fill="#d97706"/><ellipse cx="42" cy="60" rx="3" ry="5" fill="#000"/><path d="M54,46 C60,20 76,20 84,46 Z" fill="#9a3412"/><ellipse cx="34" cy="74" rx="10" ry="8" fill="#9a3412"/><circle cx="30" cy="74" r="1.5" fill="#000"/></svg>` },
+  { name: 'Deer', html: `<svg viewBox="0 0 120 120"><path d="M44,32 D M42,32 Q20,-4 32,6 Q36,10 44,26 M76,32 Q100,-4 88,6 Q84,10 76,26" fill="none" stroke="#78350f" stroke-width="2.5" stroke-linecap="round"/><path d="M26,38 Q10,32 24,20 Z M94,38 Q110,32 96,20 Z" fill="#b45309"/><ellipse cx="60" cy="68" rx="28" ry="34" fill="#d97706"/><ellipse cx="60" cy="86" rx="14" ry="10" fill="#ffedd5"/><ellipse cx="44" cy="56" rx="4" ry="6" fill="#000"/><ellipse cx="76" cy="56" rx="4" ry="6" fill="#000"/><circle cx="44" cy="53" r="1.2" fill="#fff"/><circle cx="76" cy="53" r="1.2" fill="#fff"/><ellipse cx="60" cy="80" rx="5" ry="3.5" fill="#000"/></svg>` },
+  { name: 'Bull / Cattle', html: `<svg viewBox="0 0 120 120"><path d="M24,36 Q8,20 22,12 Q34,12 38,38 M96,36 Q112,20 98,12 Q86,12 82,38" fill="none" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/><ellipse cx="60" cy="65" rx="36" ry="32" fill="#7c2d12"/><ellipse cx="60" cy="84" rx="24" ry="16" fill="#1e293b"/><ellipse cx="42" cy="54" rx="5" ry="7" fill="#1e293b"/><ellipse cx="72" cy="54" rx="5" ry="7" fill="#1e293b"/><circle cx="60" cy="24" r="8" fill="#451a03" opacity="0.4"/><circle cx="48" cy="84" r="3" fill="#fff"/><circle cx="72" cy="84" r="3" fill="#fff"/></svg>` },
+  { name: 'Wild Boar', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="64" rx="38" ry="34" fill="#431407"/><path d="M36,65 L18,80 L32,84 Z" fill="#f8fafc" stroke="#cbd5e1"/><path d="M84,65 L102,80 L88,84 Z" fill="#f8fafc" stroke="#cbd5e1"/><ellipse cx="60" cy="84" rx="18" ry="14" fill="#1a0c00"/><ellipse cx="42" cy="54" rx="4" ry="6" fill="#ea580c"/><ellipse cx="72" cy="54" rx="4" ry="6" fill="#ea580c"/><circle cx="54" cy="84" r="2" fill="#000"/><circle cx="66" cy="84" r="2" fill="#000"/></svg>` },
+
+  // ==========================================
+  // --- SMALL MAMMALS & RODENTS (21-30) ---
+  // ==========================================
+  { name: 'Rabbit', html: `<svg viewBox="0 0 120 120"><path d="M42,35 C32,5 44,-5 48,30 Z M78,35 C88,5 76,-5 72,30 Z" fill="#cbd5e1"/><path d="M43,28 C38,10 44,4 46,25 Z M77,28 C82,10 76,4 74,25 Z" fill="#fca5a5"/><ellipse cx="60" cy="74" rx="30" ry="26" fill="#e2e8f0"/><circle cx="44" cy="64" r="4.5" fill="#334155"/><circle cx="76" cy="64" r="4.5" fill="#334155"/><polygon points="60,74 55,69 65,69" fill="#f43f5e"/><path d="M52,80 Q60,85 68,80" fill="none" stroke="#94a3b8" stroke-width="2"/></svg>` },
+  { name: 'Squirrel', html: `<svg viewBox="0 0 120 120"><path d="M80,84 C118,84 118,34 94,34 C82,34 84,64 74,74" fill="none" stroke="#b45309" stroke-width="14" stroke-linecap="round"/><circle cx="52" cy="72" r="26" fill="#d97706"/><ellipse cx="38" cy="72" rx="12" ry="16" fill="#fff" opacity="0.9"/><circle cx="44" cy="60" r="4.5" fill="#000"/><ellipse cx="28" cy="76" rx="5" ry="3" fill="#451a03"/></svg>` },
+  { name: 'Hedgehog', html: `<svg viewBox="0 0 120 120"><path d="M20,70 Q10,30 45,20 Q80,10 100,45 Q115,75 85,90 Q50,100 20,70" fill="#451a03"/><path d="M14,46 L4,36 M26,26 L18,14 M50,16 L50,2 M76,20 L84,6 M98,38 L112,30 M104,64 L118,64" stroke="#270e04" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="48" cy="72" rx="26" ry="18" fill="#fed7aa"/><circle cx="36" cy="66" r="3.5" fill="#000"/><ellipse cx="22" cy="76" rx="4" ry="3" fill="#000"/></svg>` },
+  { name: 'Koala', html: `<svg viewBox="0 0 120 120"><circle cx="26" cy="44" r="18" fill="#64748b"/><circle cx="94" cy="44" r="18" fill="#64748b"/><circle cx="26" cy="44" r="11" fill="#f1f5f9"/><circle cx="94" cy="44" r="11" fill="#f1f5f9"/><circle cx="60" cy="70" r="38" fill="#94a3b8"/><circle cx="42" cy="58" r="4" fill="#111827"/><circle cx="76" cy="58" r="4" fill="#111827"/><path d="M52,62 C52,50 68,50 68,62 C68,78 52,78 52,62 Z" fill="#1e293b"/></svg>` },
+  { name: 'Beaver', html: `<svg viewBox="0 0 120 120"><path d="M60,90 Q90,120 114,102 Q100,84 74,90" fill="#1e293b"/><circle cx="60" cy="68" r="34" fill="#78350f"/><ellipse cx="60" cy="82" rx="14" ry="10" fill="#a16207"/><rect x="55" y="86" width="4" height="6" fill="#fff"/><rect x="61" y="86" width="4" height="6" fill="#fff"/><circle cx="44" cy="58" r="4" fill="#000"/><circle cx="76" cy="58" r="4" fill="#000"/></svg>` },
+  { name: 'Platypus', html: `<svg viewBox="0 0 120 120"><path d="M76,76 Q114,64 104,92 Z" fill="#1e293b"/><ellipse cx="50" cy="74" rx="30" ry="20" fill="#065f46"/><path d="M34,74 C10,68 12,86 32,86 Z" fill="#111827"/><circle cx="46" cy="66" r="3" fill="#facc15"/></svg>` },
+  { name: 'Sloth', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="68" r="36" fill="#7c2d12"/><ellipse cx="60" cy="66" rx="26" ry="22" fill="#d97706"/><path d="M38,60 Q44,52 50,64 Z M82,60 Q76,52 70,64 Z" fill="#451a03"/><circle cx="44" cy="60" r="3" fill="#fff"/><circle cx="76" cy="60" r="3" fill="#fff"/><ellipse cx="60" cy="74" rx="5" ry="3.5" fill="#000"/></svg>` },
+  { name: 'Otter', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="65" r="32" fill="#7c3aed"/><ellipse cx="60" cy="76" rx="14" ry="10" fill="#ddd6fe"/><circle cx="46" cy="56" r="4" fill="#000"/><circle cx="76" cy="56" r="4" fill="#000"/><ellipse cx="60" cy="70" rx="4" ry="3" fill="#000"/><path d="M42,72 Q44,64 50,68 M78,72 Q76,64 70,68" fill="none" stroke="#312e81" stroke-width="1.5"/></svg>` },
+  { name: 'Bat', html: `<svg viewBox="0 0 120 120"><path d="M60,65 L10,35 Q40,55 60,95 Q80,55 110,35 Z" fill="#1e1b4b"/><polygon points="46,45 40,20 52,38" fill="#312e81"/><polygon points="74,45 80,20 68,38" fill="#312e81"/><circle cx="60" cy="60" r="20" fill="#312e81"/><circle cx="52" cy="56" r="3" fill="#facc15"/><circle cx="68" cy="56" r="3" fill="#facc15"/><path d="M54,68 Q60,72 66,68" fill="none" stroke="#fff" stroke-width="1.5"/></svg>` },
+  { name: 'Pig', html: `<svg viewBox="0 0 120 120"><path d="M36,38 L24,15 L44,28 Z M84,38 L96,15 L76,28 Z" fill="#f43f5e"/><circle cx="60" cy="68" r="36" fill="#fca5a5"/><circle cx="42" cy="56" r="4.5" fill="#312e81"/><circle cx="78" cy="56" r="4.5" fill="#312e81"/><ellipse cx="60" cy="74" rx="14" ry="9" fill="#f43f5e"/><circle cx="54" cy="74" r="2.5" fill="#fff"/><circle cx="66" cy="74" r="2.5" fill="#fff"/></svg>` },
+
+  // ==========================================
+  // --- BIRDS & AVIAN SPECIES (31-40) ---
+  // ==========================================
+  { name: 'Eagle', html: `<svg viewBox="0 0 120 120"><path d="M20,65 Q60,30 100,65 Q60,115 20,65" fill="#451a03"/><path d="M36,50 C36,25 46,18 60,18 C74,18 84,25 84,50 C84,65 74,74 60,74 C46,74 36,65 36,50 Z" fill="#f8fafc"/><ellipse cx="48" cy="44" rx="4" ry="5" fill="#eab308"/><ellipse cx="72" cy="44" rx="4" ry="5" fill="#eab308"/><circle cx="48" cy="44" r="2" fill="#000"/><circle cx="72" cy="44" r="2" fill="#000"/><path d="M50,48 Q60,40 70,48 Q60,82 46,54" fill="#eab308" stroke="#ca8a04" stroke-width="1"/></svg>` },
+  { name: 'Owl', html: `<svg viewBox="0 0 120 120"><path d="M28,32 L44,48 M92,32 L76,48" stroke="#334155" stroke-width="6" stroke-linecap="round"/><circle cx="60" cy="72" r="38" fill="#475569"/><circle cx="44" cy="58" r="14" fill="#facc15"/><circle cx="76" cy="58" r="14" fill="#facc15"/><circle cx="44" cy="58" r="6" fill="#000"/><circle cx="76" cy="58" r="6" fill="#000"/><circle cx="42" cy="55" r="2" fill="#fff"/><circle cx="74" cy="55" r="2" fill="#fff"/><polygon points="60,62 53,74 67,74" fill="#ea580c"/><path d="M38,90 Q60,76 82,90" fill="none" stroke="#334155" stroke-width="3" stroke-linecap="round"/></svg>` },
+  { name: 'Falcon / Hawk', html: `<svg viewBox="0 0 120 120"><path d="M30,46 Q60,10 90,46 L74,90 L46,90 Z" fill="#78350f"/><path d="M38,44 C38,30 48,24 60,24 C72,24 82,30 82,44 Z" fill="#cbd5e1"/><ellipse cx="48" cy="38" rx="4" ry="5" fill="#facc15"/><ellipse cx="72" cy="38" rx="4" ry="5" fill="#facc15"/><circle cx="48" cy="38" r="2" fill="#000"/><circle cx="72" cy="38" r="2" fill="#000"/><path d="M52,42 Q60,44 68,42 Q60,68 50,48" fill="#111827"/></svg>` },
+  { name: 'Penguin', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="68" rx="34" ry="44" fill="#0f172a"/><ellipse cx="60" cy="74" rx="22" ry="34" fill="#fff"/><ellipse cx="46" cy="46" rx="4" ry="6" fill="#000"/><ellipse cx="74" cy="46" rx="4" ry="6" fill="#000"/><polygon points="60,50 50,58 70,58" fill="#ea580c"/><ellipse cx="42" cy="110" rx="10" ry="4" fill="#ea580c"/><ellipse cx="76" cy="110" rx="10" ry="4" fill="#ea580c"/></svg>` },
+  { name: 'Parrot', html: `<svg viewBox="0 0 120 120"><path d="M70,80 L85,120 L60,100 Z" fill="#dc2626"/><circle cx="56" cy="76" rx="18" ry="24" fill="#0284c7"/><circle cx="64" cy="44" r="20" fill="#dc2626"/><ellipse cx="60" cy="40" rx="6" ry="8" fill="#fff"/><circle cx="60" cy="40" r="3" fill="#000"/><path d="M72,38 Q94,44 74,60 Z" fill="#facc15" stroke="#eab308"/></svg>` },
+  { name: 'Flamingo', html: `<svg viewBox="0 0 120 120"><path d="M76,90 L76,120 M76,98 L64,114" fill="none" stroke="#f43f5e" stroke-width="3"/><ellipse cx="62" cy="78" rx="22" ry="16" fill="#f43f5e"/><path d="M76,74 Q92,55 84,36 Q76,14 62,20 Q52,26 64,38 Q76,50 68,74" fill="none" stroke="#f43f5e" stroke-width="7" stroke-linecap="round"/><circle cx="64" cy="24" r="2.5" fill="#000"/><path d="M58,24 Q40,26 44,38" fill="#111827" stroke="#fff" stroke-width="2"/></svg>` },
+  { name: 'Swan', html: `<svg viewBox="0 0 120 120"><path d="M42,76 Q20,72 32,96 Q60,102 82,86 Q70,76 42,76" fill="#f8fafc" stroke="#cbd5e1"/><path d="M72,80 Q96,62 82,36 Q72,12 60,18 Q52,24 64,38 Q76,52 66,78" fill="none" stroke="#f8fafc" stroke-width="7" stroke-linecap="round"/><circle cx="62" cy="22" r="2.5" fill="#000"/><polygon points="56,22 40,26 54,32" fill="#ea580c"/></svg>` },
+  { name: 'Peacock', html: `<svg viewBox="0 0 120 120"><path d="M60,75 C20,75 10,40 10,40 Q30,10 60,40 Q90,10 110,40 C110,40 100,75 60,75 Z" fill="#047857" opacity="0.7"/><circle cx="34" cy="34" r="4" fill="#0284c7"/><circle cx="86" cy="34" r="4" fill="#0284c7"/><ellipse cx="60" cy="74" rx="14" ry="24" fill="#0369a1"/><circle cx="60" cy="44" r="10" fill="#0284c7"/><circle cx="56" cy="42" r="2" fill="#fff"/><circle cx="64" cy="42" r="2" fill="#fff"/><polygon points="60,46 56,54 64,54" fill="#facc15"/></svg>` },
+  { name: 'Pelican', html: `<svg viewBox="0 0 120 120"><circle cx="66" cy="44" r="18" fill="#f1f5f9"/><ellipse cx="56" cy="78" rx="26" ry="18" fill="#e2e8f0"/><circle cx="62" cy="40" r="3" fill="#000"/><path d="M54,44 Q20,44 26,62 Q50,78 60,48" fill="#facc15" stroke="#ca8a04"/></svg>` },
+  { name: 'Stork', html: `<svg viewBox="0 0 120 120"><line x1="60" y1="84" x2="60" y2="120" stroke="#ea580c" stroke-width="3"/><circle cx="60" cy="40" r="14" fill="#fff" stroke="#cbd5e1"/><ellipse cx="54" cy="74" rx="22" ry="15" fill="#fff" stroke="#cbd5e1"/><path d="M48,40 L10,44 L46,48 Z" fill="#ea580c"/><circle cx="56" cy="36" r="2.5" fill="#000"/></svg>` },
+
+  // ==========================================
+  // --- REPTILES & AMPHIBIANS (41-45) ---
+  // ==========================================
+  { name: 'Crocodile', html: `<svg viewBox="0 0 120 120"><path d="M10,66 Q60,35 110,66 Q60,78 10,66" fill="#15803d"/><path d="M28,58 Q60,24 92,58 L106,60 L100,66 L20,66 Z" fill="#166534"/><circle cx="46" cy="50" r="4.5" fill="#facc15"/><circle cx="74" cy="50" r="4.5" fill="#facc15"/><circle cx="46" cy="50" r="2" fill="#000"/><circle cx="74" cy="50" r="2" fill="#000"/><path d="M32,66 L38,70 L44,66 L50,70 L56,66 L62,70 L68,66 L74,70 L80,66" fill="none" stroke="#fff" stroke-width="2.5"/></svg>` },
+  { name: 'Snake (Cobra)', html: `<svg viewBox="0 0 120 120"><path d="M40,50 C30,20 90,20 80,50 C72,66 48,74 60,110" fill="none" stroke="#065f46" stroke-width="12" stroke-linecap="round"/><path d="M34,40 Q60,15 86,40 Q60,54 34,40" fill="#047857" opacity="0.7"/><circle cx="48" cy="35" r="2.5" fill="#f43f5e"/><circle cx="72" cy="35" r="2.5" fill="#f43f5e"/><path d="M60,42 L60,52 L56,56" fill="none" stroke="#f43f5e" stroke-width="1.5"/></svg>` },
+  { name: 'Chameleon', html: `<svg viewBox="0 0 120 120"><path d="M84,80 C106,80 102,56 90,60 C78,64 74,80 84,80 Z" fill="none" stroke="#10b981" stroke-width="6"/><ellipse cx="50" cy="68" rx="28" ry="18" fill="#10b981"/><path d="M66,54 Q50,38 32,56" fill="none" stroke="#059669" stroke-width="7" stroke-linecap="round"/><circle cx="44" cy="62" r="8" fill="#a3e635"/><circle cx="44" cy="62" r="3" fill="#3f6212"/><path d="M28,74 Q12,74 20,64" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round"/></svg>` },
+  { name: 'Frog', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="76" rx="36" ry="24" fill="#22c55e"/><circle cx="42" cy="52" r="12" fill="#22c55e"/><circle cx="78" cy="52" r="12" fill="#22c55e"/><circle cx="42" cy="52" r="5" fill="#facc15"/><circle cx="78" cy="52" r="5" fill="#facc15"/><circle cx="42" cy="52" r="2.5" fill="#000"/><circle cx="78" cy="52" r="2.5" fill="#000"/><path d="M40,78 Q60,92 80,78" fill="none" stroke="#14532d" stroke-width="3.5" stroke-linecap="round"/><circle cx="34" cy="72" r="4" fill="#15803d"/><circle cx="86" cy="72" r="4" fill="#15803d"/></svg>` },
+  { name: 'Turtle', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="30" r="12" fill="#15803d"/><circle cx="56" cy="28" r="2" fill="#000"/><circle cx="64" cy="28" r="2" fill="#000"/><path d="M30,90 L16,104 M90,90 L104,104 M26,52 L10,44 M94,52 L110,44" stroke="#15803d" stroke-width="9" stroke-linecap="round"/><ellipse cx="60" cy="70" rx="38" ry="32" fill="#7c2d12"/><ellipse cx="60" cy="70" rx="30" ry="24" fill="#eab308"/><path d="M60,46 L60,94 M30,70 L90,70 M38,52 L82,88 M38,88 L82,52" stroke="#7c2d12" stroke-width="2.5"/></svg>` },
+
+  // ==========================================
+  // --- MARINE & AQUATIC (46-50) ---
+  // ==========================================
+  { name: 'Shark', html: `<svg viewBox="0 0 120 120"><defs><linearGradient id="shK" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#64748b"/><stop offset="100%" stop-color="#cbd5e1"/></linearGradient></defs><path d="M12,70 Q60,25 108,54 Q80,90 12,70" fill="url(#shK)"/><polygon points="56,44 72,12 76,42" fill="#475569"/><polygon points="108,54 120,38 116,66" fill="#64748b"/><circle cx="32" cy="54" r="3" fill="#000"/><path d="M40,64 Q48,60 54,64" fill="none" stroke="#475569" stroke-width="2"/><path d="M60,56 L58,66 M66,56 L64,66 M72,56 L70,66" stroke="#334155" stroke-width="2" stroke-linecap="round"/></svg>` },
+  { name: 'Whale', html: `<svg viewBox="0 0 120 120"><path d="M10,72 Q30,24 86,36 Q116,42 110,72 Q70,92 10,72" fill="#1e3a8a"/><path d="M10,72 Q40,84 80,74" fill="none" stroke="#3b82f6" stroke-width="2.5"/><path d="M110,72 L120,58 L118,82 Z" fill="#1e3a8a"/><circle cx="36" cy="54" r="3.5" fill="#fff"/></svg>` },
+  { name: 'Octopus', html: `<svg viewBox="0 0 120 120"><path d="M20,80 Q10,110 34,110 M42,88 Q42,118 60,118 M78,88 Q78,118 60,118 M100,80 Q110,110 86,110 M26,70 Q2,70 18,84 M94,70 Q118,70 102,84" fill="none" stroke="#be185d" stroke-width="9" stroke-linecap="round"/><circle cx="60" cy="54" r="34" fill="#db2777"/><circle cx="46" cy="48" r="6" fill="#fff"/><circle cx="74" cy="48" r="6" fill="#fff"/><circle cx="46" cy="48" r="2.5" fill="#000"/><circle cx="74" cy="48" r="2.5" fill="#000"/><ellipse cx="60" cy="68" rx="8" ry="5" fill="#9d174d"/></svg>` },
+  { name: 'Dolphin', html: `<svg viewBox="0 0 120 120"><path d="M10,80 Q40,25 86,32 Q110,38 114,48 Q86,52 50,86 Z" fill="#0284c7"/><polygon points="60,40 74,16 74,40" fill="#0369a1"/><circle cx="92" cy="42" r="3" fill="#fff"/></svg>` },
+  { name: 'Crab', html: `<svg viewBox="0 0 120 120"><path d="M20,50 Q2,24 24,14 Q36,30 32,46 M100,50 Q118,24 96,14 Q84,30 88,46" fill="none" stroke="#b91c1c" stroke-width="7" stroke-linecap="round"/><path d="M26,74 L6,86 M30,84 L10,100 M94,74 L114,86 M90,84 L110,100" stroke="#dc2626" stroke-width="4.5" stroke-linecap="round"/><ellipse cx="60" cy="66" rx="34" ry="24" fill="#ef4444"/><circle cx="46" cy="44" r="4.5" fill="#000"/><circle cx="74" cy="44" r="4.5" fill="#000"/><path d="M44,72 Q60,86 76,72" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>` }
+];
+
+       const fruitsPool = [
+    { name: 'Apple', html: `<svg viewBox="0 0 120 120"><path d="M60,95 C30,95 20,70 20,48 C20,25 42,22 60,35 C78,22 100,25 100,48 C100,70 90,95 60,95 Z" fill="#dc2626"/><path d="M60,32 Q64,12 75,10" fill="none" stroke="#451a03" stroke-width="3"/><path d="M62,22 Q75,15 80,24 Z" fill="#166534"/></svg>` },
+    { name: 'Orange', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="orG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#c2410c"/></radialGradient></defs><circle cx="60" cy="65" r="40" fill="url(#orG)"/><path d="M60,25 Q58,14 52,12" fill="none" stroke="#451a03" stroke-width="3"/><circle cx="50" cy="52" r="1.5" fill="#fff" opacity="0.5"/></svg>` },
+    { name: 'Watermelon', html: `<svg viewBox="0 0 120 120"><path d="M20,50 A40,40 0 0,0 100,50 Z" fill="#166534"/><path d="M25,48 A35,35 0 0,0 95,48 Z" fill="#f43f5e"/><circle cx="45" cy="65" r="2" fill="#000"/><circle cx="60" cy="72" r="2" fill="#000"/><circle cx="75" cy="65" r="2" fill="#000"/></svg>` },
+    { name: 'Banana', html: `<svg viewBox="0 0 120 120"><path d="M20,30 Q50,90 100,80 Q90,60 35,25 Z" fill="#eab308"/><path d="M20,30 Q22,25 26,26" fill="none" stroke="#451a03" stroke-width="4"/></svg>` },
+    { name: 'Grape', html: `<svg viewBox="0 0 120 120"><g fill="#7c3aed"><circle cx="50" cy="40" r="12"/><circle cx="70" cy="40" r="12"/><circle cx="60" cy="55" r="12"/><circle cx="42" cy="55" r="12"/><circle cx="78" cy="55" r="12"/><circle cx="52" cy="70" r="12"/><circle cx="68" cy="70" r="12"/><circle cx="60" cy="85" r="12"/></g><path d="M60,28 Q60,15 65,12" fill="none" stroke="#451a03" stroke-width="3"/></svg>` },
+    { name: 'Strawberry', html: `<svg viewBox="0 0 120 120"><path d="M35,35 C35,20 85,20 85,35 C85,65 60,100 60,100 C60,100 35,65 35,35 Z" fill="#ef4444"/><path d="M60,32 L50,20 L60,25 L70,20 Z" fill="#15803d"/><g fill="#fde047"><circle cx="50" cy="45" r="1.5"/><circle cx="70" cy="45" r="1.5"/><circle cx="60" cy="55" r="1.5"/><circle cx="48" cy="65" r="1.5"/><circle cx="72" cy="65" r="1.5"/><circle cx="60" cy="78" r="1.5"/></g></svg>` },
+    { name: 'Blueberry', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="35" fill="#1d4ed8"/><path d="M52,32 L60,27 L68,32 L65,25 L72,22 L63,22 L60,15 L57,22 L48,22 L55,25 Z" fill="#1e3a8a"/></svg>` },
+    { name: 'Pineapple', html: `<svg viewBox="0 0 120 120"><path d="M40,50 Q35,85 60,105 Q85,85 80,50 Q80,35 60,35 Q40,35 40,50 Z" fill="#eab308" stroke="#ca8a04" stroke-width="2"/><path d="M60,38 L50,15 L60,25 L70,15 L65,30 L80,10 L70,35 L50,35 L40,10 L55,30 Z" fill="#16a34a"/></svg>` },
+    { name: 'Peach', html: `<svg viewBox="0 0 120 120"><path d="M60,95 C30,95 25,65 25,45 C25,25 50,25 60,40 C70,25 95,25 95,45 C95,65 90,95 60,95 Z" fill="#fdba74"/><path d="M60,40 Q55,65 60,95" fill="none" stroke="#f97316" stroke-width="2"/><path d="M60,35 Q65,15 55,10" fill="none" stroke="#451a03" stroke-width="3"/></svg>` },
+    { name: 'Cherry', html: `<svg viewBox="0 0 120 120"><circle cx="40" cy="80" r="20" fill="#b91c1c"/><circle cx="80" cy="75" r="20" fill="#b91c1c"/><path d="M40,60 Q50,20 75,25 M80,55 Q78,22 75,25" fill="none" stroke="#451a03" stroke-width="3"/><path d="M75,25 Q85,15 90,25 Z" fill="#166534"/></svg>` },
+    { name: 'Pear', html: `<svg viewBox="0 0 120 120"><path d="M60,30 C45,30 45,55 35,70 C25,85 40,105 60,105 C80,105 95,85 85,70 C75,55 75,30 60,30 Z" fill="#a3e635"/><path d="M60,30 Q62,15 55,10" fill="none" stroke="#451a03" stroke-width="3"/></svg>` },
+    { name: 'Mango', html: `<svg viewBox="0 0 120 120"><path d="M45,30 C30,45 30,75 45,95 C60,110 85,100 90,75 C95,50 80,30 65,30 C55,30 50,25 45,30 Z" fill="#eab308"/><path d="M60,30 Q58,15 50,12" fill="none" stroke="#451a03" stroke-width="3"/></svg>` },
+    { name: 'Lemon', html: `<svg viewBox="0 0 120 120"><path d="M25,60 Q30,30 60,30 Q90,30 95,60 Q90,90 60,90 Q30,90 25,60 Z" fill="#facc15"/><circle cx="25" cy="60" r="4" fill="#ca8a04"/><circle cx="95" cy="60" r="4" fill="#ca8a04"/></svg>` },
+    { name: 'Lime', html: `<svg viewBox="0 0 120 120"><path d="M25,60 Q30,30 60,30 Q90,30 95,60 Q90,90 60,90 Q30,90 25,60 Z" fill="#84cc16"/><circle cx="25" cy="60" r="4" fill="#4d7c0f"/><circle cx="95" cy="60" r="4" fill="#4d7c0f"/></svg>` },
+    { name: 'Avocado', html: `<svg viewBox="0 0 120 120"><path d="M60,25 C45,25 40,50 35,70 C30,90 45,105 60,105 C75,105 90,90 85,70 C80,50 75,25 60,25 Z" fill="#3f6212"/><path d="M60,32 C48,32 45,52 41,70 C37,86 48,98 60,98 C72,98 83,86 79,70 C75,52 72,32 60,32 Z" fill="#a3e635"/><circle cx="60" cy="75" r="16" fill="#7c2d12"/></svg>` },
+    { name: 'Kiwi', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="60" rx="45" ry="35" fill="#78350f"/><ellipse cx="60" cy="60" rx="40" ry="30" fill="#a3e635"/><ellipse cx="60" cy="60" rx="15" ry="10" fill="#fef08a"/><g fill="#000"><circle cx="60" cy="42" r="1.5"/><circle cx="72" cy="46" r="1.5"/><circle cx="78" cy="55" r="1.5"/><circle cx="72" cy="64" r="1.5"/><circle cx="60" cy="70" r="1.5"/><circle cx="48" cy="64" r="1.5"/><circle cx="42" cy="55" r="1.5"/><circle cx="48" cy="46" r="1.5"/></g></svg>` },
+    { name: 'Plum', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="65" r="38" fill="#581c87"/><path d="M60,27 Q55,45 60,103" fill="none" stroke="#3b0764" stroke-width="2"/><path d="M60,27 Q62,15 68,12" fill="none" stroke="#451a03" stroke-width="3"/></svg>` },
+    { name: 'Pomegranate', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="65" r="38" fill="#991b1b"/><path d="M60,27 L55,15 L60,20 L65,15 Z" fill="#991b1b"/><circle cx="50" cy="55" r="3" fill="#ef4444"/><circle cx="70" cy="65" r="3" fill="#ef4444"/><circle cx="55" cy="75" r="3" fill="#ef4444"/></svg>` },
+    { name: 'Raspberry', html: `<svg viewBox="0 0 120 120"><g fill="#be123c"><circle cx="60" cy="45" r="10"/><circle cx="48" cy="52" r="10"/><circle cx="72" cy="52" r="10"/><circle cx="40" cy="65" r="10"/><circle cx="60" cy="65" r="10"/><circle cx="80" cy="65" r="10"/><circle cx="48" cy="78" r="10"/><circle cx="72" cy="78" r="10"/><circle cx="60" cy="90" r="10"/></g><path d="M60,35 L50,25 L70,25 Z" fill="#15803d"/></svg>` },
+    { name: 'Blackberry', html: `<svg viewBox="0 0 120 120"><g fill="#0f172a"><circle cx="60" cy="45" r="10"/><circle cx="48" cy="52" r="10"/><circle cx="72" cy="52" r="10"/><circle cx="40" cy="65" r="10"/><circle cx="60" cy="65" r="10"/><circle cx="80" cy="65" r="10"/><circle cx="48" cy="78" r="10"/><circle cx="72" cy="78" r="10"/><circle cx="60" cy="90" r="10"/></g><path d="M60,35 L50,25 L70,25 Z" fill="#166534"/></svg>` },
+    { name: 'Papaya', html: `<svg viewBox="0 0 120 120"><path d="M60,25 C48,25 45,45 40,65 C35,85 45,105 60,105 C75,105 85,85 80,65 C75,45 72,25 60,25 Z" fill="#f97316"/><path d="M60,25 Q62,12 55,10" fill="none" stroke="#451a03" stroke-width="3"/></svg>` },
+    { name: 'Coconut', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="40" fill="#451a03"/><circle cx="50" cy="50" r="4" fill="#1a0a02"/><circle cx="70" cy="50" r="4" fill="#1a0a02"/><circle cx="60" cy="68" r="4" fill="#1a0a02"/></svg>` },
+    { name: 'Fig', html: `<svg viewBox="0 0 120 120"><path d="M60,25 C45,25 40,55 35,70 C30,90 45,105 60,105 C75,105 90,90 85,70 C80,55 75,25 60,25 Z" fill="#701a75"/><path d="M60,25 Q62,15 65,12" fill="none" stroke="#451a03" stroke-width="3"/></svg>` },
+    { name: 'Grapefruit', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="40" fill="#fde047"/><circle cx="60" cy="60" r="35" fill="#f87171"/><line x1="60" y1="25" x2="60" y2="95" stroke="#fde047" stroke-width="2"/><line x1="25" y1="60" x2="95" y2="60" stroke="#fde047" stroke-width="2"/></svg>` },
+    { name: 'Melon', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="40" fill="#fef08a" stroke="#ca8a04" stroke-width="2" stroke-dasharray="4,4"/></svg>` },
+    { name: 'Guava', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="38" fill="#a3e635"/><circle cx="60" cy="22" r="3" fill="#4d7c0f"/></svg>` },
+    { name: 'Apricot', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="62" r="35" fill="#fb923c"/><path d="M60,27 Q57,50 60,97" fill="none" stroke="#ea580c" stroke-width="1.5"/><path d="M60,27 Q62,15 55,12" fill="none" stroke="#451a03" stroke-width="2"/></svg>` },
+    { name: 'Lychee', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="32" fill="#991b1b" stroke="#7f1d1d" stroke-width="3" stroke-dasharray="2,3"/></svg>` },
+    { name: 'Passionfruit', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="36" fill="#4c1d95"/><circle cx="58" cy="24" r="2" fill="#1e1b4b"/></svg>` },
+    { name: 'Dragonfruit', html: `<svg viewBox="0 0 120 120"><path d="M60,20 Q35,50 40,85 Q60,110 80,85 Q85,50 60,20 Z" fill="#ec4899"/><path d="M60,20 Q50,40 40,50 L45,40 Z" fill="#84cc16"/></svg>` },
+    { name: 'Durian', html: `<svg viewBox="0 0 120 120"><path d="M60,25 C40,25 35,55 35,70 C35,90 45,105 60,105 C75,105 85,90 85,70 C85,55 80,25 60,25 Z" fill="#a3e635"/><path d="M35,70 L25,70 L35,60 L25,50 L38,50 M85,70 L95,70 L85,60 L95,50 L82,50" fill="none" stroke="#4d7c0f" stroke-width="3"/></svg>` },
+    { name: 'Mangosteen', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="65" r="36" fill="#311042"/><path d="M60,29 Q50,20 42,32 Q60,35 60,29 Q70,20 78,32 Q60,35 60,29 Z" fill="#166534"/></svg>` },
+    { name: 'Jackfruit', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="65" rx="35" ry="45" fill="#166534" stroke="#4d7c0f" stroke-width="2" stroke-dasharray="3,3"/></svg>` },
+    { name: 'Cranberry', html: `<svg viewBox="0 0 120 120"><circle cx="45" cy="65" r="22" fill="#991b1b"/><circle cx="75" cy="55" r="22" fill="#881337"/></svg>` },
+    { name: 'Elderberry', html: `<svg viewBox="0 0 120 120"><g fill="#020617"><circle cx="50" cy="50" r="8"/><circle cx="65" cy="48" r="8"/><circle cx="58" cy="62" r="8"/><circle cx="45" cy="65" r="8"/><circle cx="72" cy="60" r="8"/></g><path d="M58,48 L58,30" fill="none" stroke="#166534" stroke-width="2"/></svg>` },
+    { name: 'Currant', html: `<svg viewBox="0 0 120 120"><g fill="#dc2626"><circle cx="60" cy="40" r="9"/><circle cx="50" cy="55" r="9"/><circle cx="70" cy="55" r="9"/><circle cx="60" cy="70" r="9"/><circle cx="50" cy="85" r="9"/></g></svg>` },
+    { name: 'Persimmon', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="65" rx="42" ry="32" fill="#ea580c"/><path d="M60,33 L50,23 L60,28 L70,23 Z" fill="#15803d"/></svg>` },
+    { name: 'Tangerine', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="62" r="38" fill="#f97316"/><circle cx="60" cy="24" r="2" fill="#451a03"/></svg>` },
+    { name: 'Kumquat', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="60" rx="25" ry="38" fill="#f97316"/></svg>` },
+    { name: 'Rambutan', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="30" fill="#991b1b"/><path d="M40,40 Q25,35 35,50 M80,40 Q95,35 85,50 M40,80 Q25,85 35,70 M80,80 Q95,85 85,70" fill="none" stroke="#991b1b" stroke-width="3"/></svg>` },
+    { name: 'Starfruit', html: `<svg viewBox="0 0 120 120"><polygon points="60,20 72,45 100,45 78,62 86,90 60,73 34,90 42,62 20,45 48,45" fill="#eab308" stroke="#ca8a04" stroke-width="2"/></svg>` },
+    { name: 'Gooseberry', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="60" rx="32" ry="38" fill="#bef264" stroke="#a3e635" stroke-width="2"/><line x1="60" y1="22" x2="60" y2="98" stroke="#a3e635" stroke-width="1.5"/></svg>` },
+    { name: 'Mulberry', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="65" rx="25" ry="40" fill="#2e1065" stroke="#4c1d95" stroke-width="2" stroke-dasharray="2,2"/></svg>` },
+    { name: 'Dates', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="60" rx="24" ry="40" fill="#78350f"/></svg>` },
+    { name: 'Olive', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="60" rx="25" ry="35" fill="#3f6212"/><circle cx="60" cy="30" r="2" fill="#14532d"/></svg>` },
+    { name: 'Boysenberry', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="65" rx="28" ry="38" fill="#4c1d95" stroke="#3b0764" stroke-width="2" stroke-dasharray="3,3"/></svg>` },
+    { name: 'Honeydew', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="40" fill="#ccfbf1" stroke="#2dd4bf" stroke-width="2"/></svg>` },
+    { name: 'Cantaloupe', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="40" fill="#ffedd5" stroke="#f97316" stroke-width="2" stroke-dasharray="5,3"/></svg>` },
+    { name: 'Quince', html: `<svg viewBox="0 0 120 120"><path d="M60,28 C45,28 42,55 35,70 C28,85 40,105 60,105 C80,105 92,85 85,70 C78,55 75,28 60,28 Z" fill="#facc15"/></svg>` },
+    { name: 'Tamarind', html: `<svg viewBox="0 0 120 120"><path d="M40,35 Q30,60 50,85 Q70,110 85,85" fill="none" stroke="#78350f" stroke-width="18" stroke-linecap="round"/></svg>` }
+];
 
         let currentLevel = 1;
         let score = 0;
@@ -360,6 +1175,22 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
+
+        function setTimeTheme() {
+            const hour = new Date().getHours();
+            const body = document.body;
+            body.classList.remove('morning', 'afternoon', 'night');
+            if (hour >= 5 && hour < 12) {
+                body.classList.add('morning');
+            } else if (hour >= 12 && hour < 18) {
+                body.classList.add('afternoon');
+            } else {
+                body.classList.add('night');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', setTimeTheme);
+        setTimeTheme();
 
         function startGame(mode) {
             gameMode = mode;
