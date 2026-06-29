@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D & 3D Shapes & Planets Challenge</title>
+    <title>Shapes, Planets, Colors, Animals & Fruits Challenge</title>
     <style>
         :root {
             --primary: #4a00e0;
@@ -11,6 +11,9 @@
             --success: #00b09b;
             --danger: #ff416c;
             --space-bg: #050510;
+            --color-bg: #f8fafc;
+            --animal-bg: #fef3c7;
+            --fruit-bg: #ecfdf5;
             --bg: #f0f2f5;
         }
 
@@ -108,7 +111,6 @@
             transition: background 0.4s ease;
         }
 
-        /* Dark outer space background style with soft star field */
         .display-area.space-mode {
             background: var(--space-bg);
             background-image: 
@@ -118,6 +120,10 @@
             background-position: 0 0, 40px 60px;
             border-color: #1e293b;
         }
+
+        .display-area.color-mode { background: var(--color-bg); border-color: #cbd5e1; }
+        .display-area.animal-mode { background: var(--animal-bg); border-color: #fde68a; }
+        .display-area.fruit-mode { background: var(--fruit-bg); border-color: #a7f3d0; }
 
         .shape {
             transition: transform 0.3s ease;
@@ -133,7 +139,6 @@
             height: clamp(110px, 24vw, 150px);
         }
 
-        /* 3D Isometric Projection Setup */
         .scene3d {
             width: clamp(80px, 18vw, 110px);
             height: clamp(80px, 18vw, 110px);
@@ -168,7 +173,6 @@
         .face-top    { transform: rotateX( 90deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); background: rgba(170, 80, 250, 0.8); }
         .face-bottom { transform: rotateX(-90deg) translateZ(calc(clamp(80px, 18vw, 110px) / 2)); }
 
-        /* Options Grid */
         .options-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -176,9 +180,7 @@
         }
 
         @media (max-width: 400px) {
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
+            .options-grid { grid-template-columns: 1fr; }
         }
 
         .btn {
@@ -200,17 +202,8 @@
             transform: translateY(-2px);
         }
 
-        .btn.correct {
-            background: var(--success) !important;
-            color: white;
-            border-color: var(--success);
-        }
-
-        .btn.wrong {
-            background: var(--danger) !important;
-            color: white;
-            border-color: var(--danger);
-        }
+        .btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .btn.wrong { background: var(--danger) !important; color: white; border-color: var(--danger); }
 
         .audio-btn {
             background: none;
@@ -222,13 +215,8 @@
             align-items: center;
         }
 
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
+        .screen { display: none; }
+        .screen.active { display: block; }
 
         #start-screen h1, #win-screen h2 {
             font-size: clamp(1.6rem, 6vw, 2.2rem);
@@ -248,6 +236,7 @@
             flex-direction: column;
             gap: 12px;
             align-items: center;
+            width: 100%;
         }
 
         .start-btn {
@@ -261,23 +250,28 @@
             box-shadow: 0 5px 15px rgba(142, 45, 226, 0.4);
             width: 100%;
             max-width: 280px;
+            transition: transform 0.2s;
         }
+        .start-btn:hover { transform: translateY(-2px); }
 
-        .start-btn.space {
-            background: linear-gradient(90deg, #1e3a8a, #3b82f6);
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-        }
+        .start-btn.space { background: linear-gradient(90deg, #1e3a8a, #3b82f6); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
+        .start-btn.colors { background: linear-gradient(90deg, #ec4899, #f43f5e); box-shadow: 0 5px 15px rgba(244, 63, 94, 0.4); }
+        .start-btn.animals { background: linear-gradient(90deg, #d97706, #f59e0b); box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); }
+        .start-btn.fruits { background: linear-gradient(90deg, #10b981, #10b981); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4); }
     </style>
 </head>
 <body>
 
     <div class="game-container">
         <div id="start-screen" class="screen active">
-            <h1>Shapes & Planets!</h1>
+            <h1>Kids Challenge!</h1>
             <p>Master 50 Levels with interactive voice commentary. Choose your challenge mode below!</p>
             <div class="button-group">
                 <button class="start-btn" onclick="startGame('shapes')">Geometry Mode 🔺</button>
                 <button class="start-btn space" onclick="startGame('planets')">Planet Mode 🚀</button>
+                <button class="start-btn colors" onclick="startGame('colors')">Color Mode 🎨</button>
+                <button class="start-btn animals" onclick="startGame('animals')">Animal Mode 🦁</button>
+                <button class="start-btn fruits" onclick="startGame('fruits')">Fruit Mode 🍉</button>
             </div>
         </div>
 
@@ -296,11 +290,9 @@
                 <button class="audio-btn" onclick="repeatQuestion()" aria-label="Repeat Audio">🔊</button>
             </div>
 
-            <div class="display-area" id="shape-viewport">
-                </div>
+            <div class="display-area" id="shape-viewport"></div>
 
-            <div class="options-grid" id="options-container">
-                </div>
+            <div class="options-grid" id="options-container"></div>
         </div>
 
         <div id="win-screen" class="screen">
@@ -313,132 +305,40 @@
 
     <script>
         const shapes2D = [
-            { name: 'Circle', type: '2D', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#36d1dc" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Square', type: '2D', html: `<svg viewBox="0 0 120 120"><rect x="10" y="10" width="100" height="100" fill="#ff7675" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Triangle', type: '2D', html: `<svg viewBox="0 0 120 120"><polygon points="60,10 110,110 10,110" fill="#00cec9" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Rectangle', type: '2D', html: `<svg viewBox="0 0 140 120"><rect x="10" y="25" width="120" height="70" fill="#6c5ce7" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Pentagon', type: '2D', html: `<svg viewBox="0 0 120 120"><polygon points="60,10 110,45 90,110 30,110 10,45" fill="#fdcb6e" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Hexagon', type: '2D', html: `<svg viewBox="0 0 120 120"><polygon points="60,10 110,35 110,85 60,110 10,85 10,35" fill="#e84393" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Oval', type: '2D', html: `<svg viewBox="0 0 140 120"><ellipse cx="70" cy="60" rx="60" ry="40" fill="#00b894" stroke="#fff" stroke-width="3"/></svg>` },
-            { name: 'Star', type: '2D', html: `<svg viewBox="0 0 120 120"><polygon points="60,5 75,45 115,45 83,70 95,110 60,85 25,110 37,70 5,45 45,45" fill="#f1c40f" stroke="#fff" stroke-width="3"/></svg>` }
+            { name: 'Circle', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#36d1dc" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Square', html: `<svg viewBox="0 0 120 120"><rect x="10" y="10" width="100" height="100" fill="#ff7675" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Triangle', html: `<svg viewBox="0 0 120 120"><polygon points="60,10 110,110 10,110" fill="#00cec9" stroke="#fff" stroke-width="3"/></svg>` },
+            { name: 'Rectangle', html: `<svg viewBox="0 0 140 120"><rect x="10" y="25" width="120" height="70" fill="#6c5ce7" stroke="#fff" stroke-width="3"/></svg>` }
         ];
 
         const shapes3D = [
-            { name: 'Cube', type: '3D', html: `<div class="scene3d"><div class="cube"><div class="cube-face face-front"></div><div class="cube-face face-back"></div><div class="cube-face face-right"></div><div class="cube-face face-left"></div><div class="cube-face face-top"></div><div class="cube-face face-bottom"></div></div></div>` },
-            { name: 'Sphere', type: '3D', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="sphereGrad" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#a29bfe"/><stop offset="100%" stop-color="#6c5ce7"/></radialGradient></defs><circle cx="60" cy="60" r="50" fill="url(#sphereGrad)"/></svg>` },
-            { name: 'Cylinder', type: '3D', html: `<svg viewBox="0 0 120 140"><ellipse cx="60" cy="25" rx="35" ry="12" fill="#ffeaa7" stroke="#d63031" stroke-width="2"/><path d="M25,25 L25,105 A35,12 0 0,0 95,105 L95,25" fill="#fab1a0" stroke="#d63031" stroke-width="2"/><ellipse cx="60" cy="105" rx="35" ry="12" fill="#fab1a0" stroke="#d63031" stroke-width="2"/></svg>` },
-            { name: 'Cone', type: '3D', html: `<svg viewBox="0 0 120 140"><path d="M60,15 L25,105 A35,12 0 0,0 95,105 Z" fill="#95afc0" stroke="#535c68" stroke-width="2"/><ellipse cx="60" cy="105" rx="35" ry="12" fill="#c7ecee" stroke="#535c68" stroke-width="2"/></svg>` }
+            { name: 'Cube', html: `<div class="scene3d"><div class="cube"><div class="cube-face face-front"></div><div class="cube-face face-back"></div><div class="cube-face face-right"></div><div class="cube-face face-left"></div><div class="cube-face face-top"></div><div class="cube-face face-bottom"></div></div></div>` },
+            { name: 'Sphere', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="sphereGrad" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#a29bfe"/><stop offset="100%" stop-color="#6c5ce7"/></radialGradient></defs><circle cx="60" cy="60" r="50" fill="url(#sphereGrad)"/></svg>` }
         ];
 
-        // NEW: Photorealistic planet vector renderings using layered shading models
         const planetsPool = [
-            { name: 'Mars', type: 'Planet', html: `
-                <svg viewBox="0 0 120 120">
-                    <defs>
-                        <radialGradient id="marsBase" cx="30%" cy="30%" r="70%">
-                            <stop offset="0%" stop-color="#f87171"/>
-                            <stop offset="45%" stop-color="#e11d48"/>
-                            <stop offset="85%" stop-color="#9f1239"/>
-                            <stop offset="100%" stop-color="#4c0519"/>
-                        </radialGradient>
-                        <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
-                            <stop offset="75%" stop-color="#000" stop-opacity="0"/>
-                            <stop offset="100%" stop-color="#000" stop-opacity="0.8"/>
-                        </radialGradient>
-                    </defs>
-                    <circle cx="60" cy="60" r="48" fill="url(#marsBase)"/>
-                    <path d="M35,30 Q45,20 65,35 T90,30 T50,55 Z" fill="#881337" opacity="0.4"/>
-                    <path d="M25,75 Q50,60 70,80 T100,65 Q80,95 45,90 Z" fill="#4c0519" opacity="0.3"/>
-                    <circle cx="58" cy="14" rx="10" ry="3" fill="#fee2e2" opacity="0.6" transform="rotate(-10 58 14)"/> <circle cx="60" cy="60" r="48" fill="url(#shadow)"/>
-                </svg>` 
-            },
-            { name: 'Earth', type: 'Planet', html: `
-                <svg viewBox="0 0 120 120">
-                    <defs>
-                        <radialGradient id="oceanGrad" cx="35%" cy="35%" r="65%">
-                            <stop offset="0%" stop-color="#38bdf8"/>
-                            <stop offset="30%" stop-color="#1d4ed8"/>
-                            <stop offset="85%" stop-color="#1e3a8a"/>
-                            <stop offset="100%" stop-color="#0f172a"/>
-                        </radialGradient>
-                        <radialGradient id="atmosphere" cx="50%" cy="50%" r="50%">
-                            <stop offset="90%" stop-color="#06b6d4" stop-opacity="0"/>
-                            <stop offset="98%" stop-color="#06b6d4" stop-opacity="0.5"/>
-                            <stop offset="100%" stop-color="#38bdf8" stop-opacity="1"/>
-                        </radialGradient>
-                    </defs>
-                    <circle cx="60" cy="60" r="48" fill="url(#oceanGrad)"/>
-                    <path d="M40,25 Q42,15 65,22 Q75,30 70,45 Q55,60 45,50 Z M25,65 Q35,55 55,70 Q75,60 85,75 Q70,95 40,90 Q20,85 25,65 Z" fill="#15803d" opacity="0.85"/>
-                    <path d="M42,28 Q48,22 58,30 M30,70 Q45,65 55,75" fill="#166534" opacity="0.9"/> <path d="M20,40 Q40,30 65,45 T100,35 Q80,55 50,48 T20,40 Z M35,75 Q60,65 85,80 Q65,90 40,85 Z" fill="#ffffff" opacity="0.45"/>
-                    <circle cx="60" cy="60" r="48" fill="url(#shadow)"/>
-                    <circle cx="60" cy="60" r="49" fill="url(#atmosphere)" pointer-events="none"/>
-                </svg>` 
-            },
-            { name: 'Saturn', type: 'Planet', html: `
-                <svg viewBox="0 0 160 120">
-                    <defs>
-                        <radialGradient id="saturnGrad" cx="40%" cy="35%" r="60%">
-                            <stop offset="0%" stop-color="#fef08a"/>
-                            <stop offset="60%" stop-color="#eab308"/>
-                            <stop offset="85%" stop-color="#a16207"/>
-                            <stop offset="100%" stop-color="#451a03"/>
-                        </radialGradient>
-                    </defs>
-                    <g transform="rotate(-12 80 60)">
-                        <ellipse cx="80" cy="60" rx="72" ry="18" fill="none" stroke="#a16207" stroke-width="8" opacity="0.3"/>
-                        <ellipse cx="80" cy="60" rx="66" ry="15" fill="none" stroke="#ca8a04" stroke-width="6" opacity="0.6"/>
-                        <ellipse cx="80" cy="60" rx="58" ry="11" fill="none" stroke="#fef08a" stroke-width="4" opacity="0.5"/>
-                    </g>
-                    <circle cx="80" cy="60" r="38" fill="url(#saturnGrad)"/>
-                    <path d="M43,52 Q80,58 117,52 L116,56 Q80,62 44,56 Z" fill="#ca8a04" opacity="0.4"/>
-                    <path d="M46,42 Q80,47 114,42 L113,45 Q80,50 47,45 Z" fill="#854d0e" opacity="0.3"/>
-                    <circle cx="80" cy="60" r="38" fill="url(#shadow)"/>
-                    <g transform="rotate(-12 80 60)">
-                        <path d="M8,60 A72,18 0 0,0 152,60" fill="none" stroke="#a16207" stroke-width="8" opacity="0.4"/>
-                        <path d="M14,60 A66,15 0 0,0 146,60" fill="none" stroke="#ca8a04" stroke-width="6" opacity="0.8"/>
-                        <path d="M22,60 A58,11 0 0,0 138,60" fill="none" stroke="#fef08a" stroke-width="4" opacity="0.7"/>
-                    </g>
-                </svg>` 
-            },
-            { name: 'Neptune', type: 'Planet', html: `
-                <svg viewBox="0 0 120 120">
-                    <defs>
-                        <radialGradient id="nepGrad" cx="30%" cy="30%" r="70%">
-                            <stop offset="0%" stop-color="#60a5fa"/>
-                            <stop offset="40%" stop-color="#2563eb"/>
-                            <stop offset="80%" stop-color="#1d4ed8"/>
-                            <stop offset="100%" stop-color="#031b4e"/>
-                        </radialGradient>
-                    </defs>
-                    <circle cx="60" cy="60" r="48" fill="url(#nepGrad)"/>
-                    <ellipse cx="45" cy="55" rx="14" ry="6" fill="#1e3a8a" opacity="0.5" transform="rotate(-10 45 55)"/> <path d="M20,35 Q50,42 100,30" fill="none" stroke="#93c5fd" stroke-width="1.5" opacity="0.4"/>
-                    <path d="M15,75 Q60,65 105,72" fill="none" stroke="#2563eb" stroke-width="2" opacity="0.6"/>
-                    <path d="M45,70 Q55,68 65,72" fill="none" stroke="#fff" stroke-width="1" opacity="0.5"/> <circle cx="60" cy="60" r="48" fill="url(#shadow)"/>
-                </svg>` 
-            },
-            { name: 'Jupiter', type: 'Planet', html: `
-                <svg viewBox="0 0 120 120">
-                    <defs>
-                        <radialGradient id="jupGrad" cx="35%" cy="30%" r="65%">
-                            <stop offset="0%" stop-color="#ffedd5"/>
-                            <stop offset="25%" stop-color="#fed7aa"/>
-                            <stop offset="55%" stop-color="#ea580c"/>
-                            <stop offset="85%" stop-color="#9a3412"/>
-                            <stop offset="100%" stop-color="#431407"/>
-                        </radialGradient>
-                    </defs>
-                    <circle cx="60" cy="60" r="48" fill="url(#jupGrad)"/>
-                    <path d="M13,42 Q60,48 107,42 L109,47 Q60,53 11,47 Z" fill="#ffedd5" opacity="0.25"/>
-                    <path d="M11,54 Q60,60 109,54 L111,61 Q60,67 9,61 Z" fill="#7c2d12" opacity="0.4"/>
-                    <path d="M12,68 Q60,72 108,68 L106,73 Q60,77 14,73 Z" fill="#fdba74" opacity="0.3"/>
-                    <ellipse cx="78" cy="72" rx="10" ry="6" fill="#991b1b" opacity="0.85"/>
-                    <ellipse cx="78" cy="71" rx="7" ry="3" fill="#ea580c" opacity="0.6"/>
-                    <circle cx="60" cy="60" r="48" fill="url(#shadow)"/>
-                </svg>` 
-            }
+            { name: 'Mars', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="marsBase" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f87171"/><stop offset="100%" stop-color="#4c0519"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#marsBase)"/></svg>` },
+            { name: 'Earth', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="earGrad" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#1e3a8a"/></radialGradient></defs><circle cx="60" cy="60" r="48" fill="url(#earGrad)"/><path d="M40,25 Q50,20 65,35 T90,30 Z" fill="#15803d" opacity="0.7"/></svg>` }
         ];
 
-        const allShapes = [...shapes2D, ...shapes3D];
+        const colorsPool = [
+            { name: 'Red', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="redG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#redG)" stroke="#fff" stroke-width="2"/></svg>` },
+            { name: 'Blue', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="blueG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1e3a8a"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#blueG)" stroke="#fff" stroke-width="2"/></svg>` },
+            { name: 'Green', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="greenG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#064e3b"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#greenG)" stroke="#fff" stroke-width="2"/></svg>` },
+            { name: 'Yellow', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="yellowG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#facc15"/><stop offset="100%" stop-color="#78350f"/></radialGradient></defs><circle cx="60" cy="60" r="46" fill="url(#yellowG)" stroke="#fff" stroke-width="2"/></svg>` }
+        ];
+
+        const animalsPool = [
+            { name: 'Cat', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="65" r="35" fill="#f59e0b"/><polygon points="32,42 45,15 55,38" fill="#b45309"/><polygon points="88,42 75,15 65,38" fill="#b45309"/><circle cx="48" cy="55" r="4" fill="#000"/><circle cx="72" cy="55" r="4" fill="#000"/><path d="M52,72 Q60,78 68,72" fill="none" stroke="#000" stroke-width="2"/></svg>` },
+            { name: 'Frog', html: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="70" rx="40" ry="28" fill="#22c55e"/><circle cx="42" cy="45" r="12" fill="#22c55e"/><circle cx="78" cy="45" r="12" fill="#22c55e"/><circle cx="42" cy="45" r="5" fill="#000"/><circle cx="78" cy="45" r="5" fill="#000"/><path d="M45,72 Q60,82 75,72" fill="none" stroke="#14532d" stroke-width="3"/></svg>` },
+            { name: 'Panda', html: `<svg viewBox="0 0 120 120"><circle cx="60" cy="65" r="38" fill="#fff" stroke="#ccc" stroke-width="1"/><circle cx="32" cy="35" r="14" fill="#000"/><circle cx="88" cy="35" r="14" fill="#000"/><ellipse cx="46" cy="58" rx="10" ry="14" fill="#000"/><ellipse cx="74" cy="58" rx="10" ry="14" fill="#000"/><circle cx="46" cy="54" r="4" fill="#fff"/><circle cx="74" cy="54" r="4" fill="#fff"/><polygon points="60,72 55,67 65,67" fill="#000"/></svg>` }
+        ];
+
+        const fruitsPool = [
+            { name: 'Apple', html: `<svg viewBox="0 0 120 120"><path d="M60,95 C30,95 20,70 20,48 C20,25 42,22 60,35 C78,22 100,25 100,48 C100,70 90,95 60,95 Z" fill="#dc2626"/><path d="M60,32 Q64,12 75,10" fill="none" stroke="#451a03" stroke-width="3"/><path d="M62,22 Q75,15 80,24 Z" fill="#166534"/></svg>` },
+            { name: 'Orange', html: `<svg viewBox="0 0 120 120"><defs><radialGradient id="orG" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#c2410c"/></radialGradient></defs><circle cx="60" cy="65" r="40" fill="url(#orG)"/><path d="M60,25 Q58,14 52,12" fill="none" stroke="#451a03" stroke-width="3"/><circle cx="50" cy="52" r="1.5" fill="#fff" opacity="0.5"/></svg>` },
+            { name: 'Watermelon', html: `<svg viewBox="0 0 120 120"><path d="M20,50 A40,40 0 0,0 100,50 Z" fill="#166534"/><path d="M25,48 A35,35 0 0,0 95,48 Z" fill="#f43f5e"/><circle cx="45" cy="65" r="2" fill="#000"/><circle cx="60" cy="72" r="2" fill="#000"/><circle cx="75" cy="65" r="2" fill="#000"/></svg>` }
+        ];
 
         let currentLevel = 1;
         let score = 0;
@@ -467,11 +367,12 @@
             score = 0;
             
             const viewport = document.getElementById('shape-viewport');
-            if (gameMode === 'planets') {
-                viewport.classList.add('space-mode');
-            } else {
-                viewport.classList.remove('space-mode');
-            }
+            viewport.className = 'display-area'; 
+            
+            if (gameMode === 'planets') viewport.classList.add('space-mode');
+            else if (gameMode === 'colors') viewport.classList.add('color-mode');
+            else if (gameMode === 'animals') viewport.classList.add('animal-mode');
+            else if (gameMode === 'fruits') viewport.classList.add('fruit-mode');
 
             showScreen('game-screen');
             loadLevel();
@@ -484,110 +385,110 @@
             document.getElementById('progress-juice').style.width = `${(currentLevel / 50) * 100}%`;
 
             let questionText = "";
-            let pool = gameMode === 'shapes' ? [...allShapes] : [...planetsPool];
-            currentItem = pool[Math.floor(Math.random() * pool.length)];
+            let pool = [];
 
             if (gameMode === 'shapes') {
-                let questionType = currentLevel % 3; 
-                if (questionType === 1) {
-                    questionText = `Identify the shape shown in the picture.`;
-                } else if (questionType === 2) {
-                    questionText = `Is this a 2D shape or a 3D shape?`;
-                } else {
-                    questionText = `Find the ${currentItem.name}.`;
-                }
-                generateOptions(questionType);
-            } else {
+                pool = [...shapes2D, ...shapes3D];
+                currentItem = pool[Math.floor(Math.random() * pool.length)];
+                let isTypeQuestion = currentLevel % 2 === 0;
+                questionText = isTypeQuestion ? `Is this a 2D or 3D shape?` : `Identify the shape shown in the picture.`;
+                generateGenericOptions(pool, 4);
+            } else if (gameMode === 'planets') {
+                pool = [...planetsPool];
+                currentItem = pool[Math.floor(Math.random() * pool.length)];
                 questionText = `Which cosmic planet is this?`;
-                generatePlanetOptions();
+                generateGenericOptions(pool, 2);
+            } else if (gameMode === 'colors') {
+                pool = [...colorsPool];
+                currentItem = pool[Math.floor(Math.random() * pool.length)];
+                questionText = `What beautiful color is this?`;
+                generateGenericOptions(pool, 4);
+            } else if (gameMode === 'animals') {
+                pool = [...animalsPool];
+                currentItem = pool[Math.floor(Math.random() * pool.length)];
+                questionText = `What is the name of this animal?`;
+                generateGenericOptions(pool, 3);
+            } else if (gameMode === 'fruits') {
+                pool = [...fruitsPool];
+                currentItem = pool[Math.floor(Math.random() * pool.length)];
+                questionText = `Can you identify this tasty fruit?`;
+                generateGenericOptions(pool, 3);
             }
 
             document.getElementById('question-text').innerText = questionText;
             document.getElementById('shape-viewport').innerHTML = `<div class="shape">${currentItem.html}</div>`;
-
             speak(questionText);
         }
 
-        function generateOptions(type) {
+        function generateGenericOptions(pool, count) {
             const container = document.getElementById('options-container');
             container.innerHTML = '';
-            let options = [];
-
-            if (type === 2) {
-                options = ['2D', '3D'];
-            } else {
-                options.push(currentItem.name);
-                while (options.length < 4) {
-                    let randomShape = allShapes[Math.floor(Math.random() * allShapes.length)].name;
-                    if (!options.includes(randomShape)) {
-                        options.push(randomShape);
-                    }
-                }
-                options.sort(() => Math.random() - 0.5);
+            
+            if (gameMode === 'shapes' && currentLevel % 2 === 0) {
+                renderButtons(['2D', '3D']);
+                return;
             }
 
-            renderButtons(options, type);
-        }
-
-        function generatePlanetOptions() {
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
             let options = [currentItem.name];
-
-            while (options.length < 2) {
-                let randomPlanet = planetsPool[Math.floor(Math.random() * planetsPool.length)].name;
-                if (!options.includes(randomPlanet)) {
-                    options.push(randomPlanet);
+            let maxOptions = Math.min(count, pool.length);
+            while (options.length < maxOptions) {
+                let randomItem = pool[Math.floor(Math.random() * pool.length)].name;
+                if (!options.includes(randomItem)) {
+                    options.push(randomItem);
                 }
             }
             options.sort(() => Math.random() - 0.5);
-            renderButtons(options, 0);
+            renderButtons(options);
         }
 
-        function renderButtons(options, type) {
+        function renderButtons(options) {
             const container = document.getElementById('options-container');
             options.forEach(opt => {
                 const button = document.createElement('button');
                 button.className = 'btn';
                 button.innerText = opt;
-                button.onclick = () => handleAnswer(opt, button, type);
+                button.onclick = () => handleAnswer(opt, button);
                 container.appendChild(button);
             });
         }
 
-        function handleAnswer(selected, button, type) {
+        function handleAnswer(selected, button) {
             if (isProcessing) return;
             isProcessing = true;
 
-            let isCorrect = false;
-            if (gameMode === 'shapes' && type === 2) {
-                isCorrect = (selected === currentItem.type);
-            } else {
-                isCorrect = (selected === currentItem.name);
+            let correctName = currentItem.name;
+            if (gameMode === 'shapes' && currentLevel % 2 === 0) {
+                correctName = shapes2D.some(s => s.name === currentItem.name) ? '2D' : '3D';
             }
+
+            const isCorrect = (selected === correctName);
 
             if (isCorrect) {
                 button.classList.add('correct');
                 score += 10;
                 speak("Correct! Outstanding job.");
-                
-                setTimeout(() => {
-                    if (currentLevel < 50) {
-                        currentLevel++;
-                        loadLevel();
-                    } else {
-                        endGame();
-                    }
-                }, 1500);
             } else {
                 button.classList.add('wrong');
-                speak("Try again!");
+                speak("Oh! Let's try a different one.");
                 
-                setTimeout(() => {
-                    isProcessing = false;
-                    button.classList.remove('wrong');
-                }, 1200);
+                // Highlight the true correct answer button for clarity
+                const buttons = document.querySelectorAll('.options-grid .btn');
+                buttons.forEach(btn => {
+                    if (btn.innerText === correctName) {
+                        btn.classList.add('correct');
+                    }
+                });
             }
+
+            // Always load a brand new question layout after a brief visibility delay
+            setTimeout(() => {
+                if (currentLevel < 50) {
+                    currentLevel++;
+                    loadLevel();
+                } else {
+                    endGame();
+                }
+            }, 1500);
         }
 
         function repeatQuestion() {
@@ -597,10 +498,10 @@
 
         function endGame() {
             showScreen('win-screen');
-            const msg = gameMode === 'shapes' ? "You became a true Shapes Master!" : "You conquered the entire Solar System!";
+            let msg = `You completed the ${gameMode.toUpperCase()} challenge loop successfully!`;
             document.getElementById('win-message').innerText = msg;
             document.getElementById('final-score').innerText = `Your Final Score: ${score} points`;
-            speak(`Congratulations! ${msg}`);
+            speak("Congratulations! Excellent work.");
         }
     </script>
 </body>
